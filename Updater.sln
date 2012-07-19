@@ -13,6 +13,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UpdateTool", "UpdateTool\Up
 		{76A92D02-87F6-4E8F-A6E4-15EE52F3D950} = {76A92D02-87F6-4E8F-A6E4-15EE52F3D950}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libupdate", "libupdate\libupdate.vcproj", "{5923C496-E031-4B62-9970-55E2A90D292F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -31,6 +33,10 @@ Global
 		{55E54A49-42E6-40CB-AF4E-3E8554F5D98C}.Debug|Win32.Build.0 = Debug|Win32
 		{55E54A49-42E6-40CB-AF4E-3E8554F5D98C}.Release|Win32.ActiveCfg = Release|Win32
 		{55E54A49-42E6-40CB-AF4E-3E8554F5D98C}.Release|Win32.Build.0 = Release|Win32
+		{5923C496-E031-4B62-9970-55E2A90D292F}.Debug|Win32.ActiveCfg = Debug|Win32
+		{5923C496-E031-4B62-9970-55E2A90D292F}.Debug|Win32.Build.0 = Debug|Win32
+		{5923C496-E031-4B62-9970-55E2A90D292F}.Release|Win32.ActiveCfg = Release|Win32
+		{5923C496-E031-4B62-9970-55E2A90D292F}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
