@@ -4,7 +4,7 @@
 	Version="8.00"
 	Name="UpdateTool"
 	ProjectGUID="{55E54A49-42E6-40CB-AF4E-3E8554F5D98C}"
-	RootNamespace="Tester"
+	RootNamespace="UpdateTools"
 	>
 	<Platforms>
 		<Platform
@@ -40,11 +40,11 @@
 				MkTypLibCompatible="false"
 				TargetEnvironment="1"
 				GenerateStublessProxies="true"
-				TypeLibraryName="$(IntDir)/Tester.tlb"
-				HeaderFileName="Tester.h"
+				TypeLibraryName="$(IntDir)/UpdateTools.tlb"
+				HeaderFileName="UpdateTools.h"
 				DLLDataFileName=""
-				InterfaceIdentifierFileName="Tester_i.c"
-				ProxyFileName="Tester_p.c"
+				InterfaceIdentifierFileName="UpdateTools_i.c"
+				ProxyFileName="UpdateTools_p.c"
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
@@ -135,11 +135,11 @@
 				MkTypLibCompatible="false"
 				TargetEnvironment="1"
 				GenerateStublessProxies="true"
-				TypeLibraryName="$(IntDir)/Tester.tlb"
-				HeaderFileName="Tester.h"
+				TypeLibraryName="$(IntDir)/UpdateTools.tlb"
+				HeaderFileName="UpdateTools.h"
 				DLLDataFileName=""
-				InterfaceIdentifierFileName="Tester_i.c"
-				ProxyFileName="Tester_p.c"
+				InterfaceIdentifierFileName="UpdateTools_i.c"
+				ProxyFileName="UpdateTools_p.c"
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
@@ -167,7 +167,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="tinyxml.lib"
-				OutputFile="..\release\$(ProjectName).exe"
+				OutputFile="..\release\UpdateTool.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="../common/tinyxml/lib"
 				IgnoreDefaultLibraryNames="atlmincrt.lib;LIBC.lib"
@@ -226,6 +226,22 @@
 			<File
 				RelativePath="..\common\md5\md5.cpp"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\stdafx.cpp"
@@ -273,7 +289,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\common\md5\md5.h"
+				RelativePath="..\common\md5\md5.hpp"
 				>
 			</File>
 			<File
@@ -302,7 +318,7 @@
 	<Globals>
 		<Global
 			Name="RESOURCE_FILE"
-			Value="Tester.rc"
+			Value="UpdateTools.rc"
 		/>
 	</Globals>
 </VisualStudioProject>

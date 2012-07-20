@@ -93,7 +93,7 @@ extern CAppModule _Module;
 
 #include "ResizableLib/ResizableLib.h"
 
-#include <md5.h>
+#include <md5.hpp>
 
 #include <zlib.h>
 #include <zip.h>

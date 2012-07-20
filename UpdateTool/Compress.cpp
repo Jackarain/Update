@@ -1,7 +1,7 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "Compress.h"
 
-#include <md5.h>
+#include <md5.hpp>
 
 
 CCompress::CCompress(void)

@@ -50,7 +50,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="-Zm200"
 				Optimization="0"
-				AdditionalIncludeDirectories="../common/tinyxml;../common/md5;../common/zlib-1.2.5"
+				AdditionalIncludeDirectories="../libupdate"
 				PreprocessorDefinitions="WIN32;_WINDOWS;STRICT;_DEBUG"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -73,6 +73,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				OutputFile="..\debug\Update.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="../common/tinyxml/lib"
 				IgnoreDefaultLibraryNames="LIBCD.lib"
@@ -140,7 +141,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalOptions="-Zm200"
-				AdditionalIncludeDirectories="../common/tinyxml;../common/md5;../common/zlib-1.2.5"
+				AdditionalIncludeDirectories="../libupdate"
 				PreprocessorDefinitions="WIN32;_WINDOWS;STRICT;NDEBUG"
 				RuntimeLibrary="0"
 				UsePrecompiledHeader="2"
@@ -161,6 +162,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				OutputFile="..\release\Update.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="../common/tinyxml/lib"
 				IgnoreDefaultLibraryNames="atlmincrt.lib;LIBC.lib"
@@ -209,14 +211,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\common\md5\md5.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\parser_http_date.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\stdafx.cpp"
 				>
 				<FileConfiguration
@@ -236,27 +230,11 @@
 					/>
 				</FileConfiguration>
 			</File>
-			<File
-				RelativePath=".\uncompress.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\updater.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\url.cpp"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc"
 			>
-			<File
-				RelativePath=".\inc.h"
-				>
-			</File>
 			<File
 				RelativePath=".\MainDlg.h"
 				>
@@ -267,18 +245,6 @@
 			</File>
 			<File
 				RelativePath=".\stdafx.h"
-				>
-			</File>
-			<File
-				RelativePath=".\uncompress.h"
-				>
-			</File>
-			<File
-				RelativePath=".\updater.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\url.hpp"
 				>
 			</File>
 		</Filter>

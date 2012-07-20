@@ -40,7 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="./tinyxml;./zlib"
+				AdditionalIncludeDirectories="../common/tinyxml;../common/md5;../common/zlib-1.2.5"
 				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -147,10 +147,6 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\md5.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\parser_http_date.cpp"
 				>
 			</File>
@@ -170,19 +166,19 @@
 				Name="tinyxml"
 				>
 				<File
-					RelativePath=".\tinyxml\tinystr.cpp"
+					RelativePath="..\common\tinyxml\tinystr.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\tinyxml\tinyxml.cpp"
+					RelativePath="..\common\tinyxml\tinyxml.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\tinyxml\tinyxmlerror.cpp"
+					RelativePath="..\common\tinyxml\tinyxmlerror.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\tinyxml\tinyxmlparser.cpp"
+					RelativePath="..\common\tinyxml\tinyxmlparser.cpp"
 					>
 				</File>
 			</Filter>
@@ -190,91 +186,99 @@
 				Name="zlib"
 				>
 				<File
-					RelativePath=".\zlib\adler32.c"
+					RelativePath="..\common\zlib-1.2.5\adler32.c"
 					>
 				</File>
 				<File
-					RelativePath=".\zlib\compress.c"
+					RelativePath="..\common\zlib-1.2.5\compress.c"
 					>
 				</File>
 				<File
-					RelativePath=".\zlib\crc32.c"
+					RelativePath="..\common\zlib-1.2.5\crc32.c"
 					>
 				</File>
 				<File
-					RelativePath=".\zlib\deflate.c"
+					RelativePath="..\common\zlib-1.2.5\deflate.c"
 					>
 				</File>
 				<File
-					RelativePath=".\zlib\example.c"
+					RelativePath="..\common\zlib-1.2.5\example.c"
 					>
 				</File>
 				<File
-					RelativePath=".\zlib\gzclose.c"
+					RelativePath="..\common\zlib-1.2.5\gzclose.c"
 					>
 				</File>
 				<File
-					RelativePath=".\zlib\gzlib.c"
+					RelativePath="..\common\zlib-1.2.5\gzlib.c"
 					>
 				</File>
 				<File
-					RelativePath=".\zlib\gzread.c"
+					RelativePath="..\common\zlib-1.2.5\gzread.c"
 					>
 				</File>
 				<File
-					RelativePath=".\zlib\gzwrite.c"
+					RelativePath="..\common\zlib-1.2.5\gzwrite.c"
 					>
 				</File>
 				<File
-					RelativePath=".\zlib\infback.c"
+					RelativePath="..\common\zlib-1.2.5\infback.c"
 					>
 				</File>
 				<File
-					RelativePath=".\zlib\inffast.c"
+					RelativePath="..\common\zlib-1.2.5\inffast.c"
 					>
 				</File>
 				<File
-					RelativePath=".\zlib\inflate.c"
+					RelativePath="..\common\zlib-1.2.5\inflate.c"
 					>
 				</File>
 				<File
-					RelativePath=".\zlib\inftrees.c"
+					RelativePath="..\common\zlib-1.2.5\inftrees.c"
 					>
 				</File>
 				<File
-					RelativePath=".\zlib\ioapi.c"
+					RelativePath="..\common\zlib-1.2.5\ioapi.c"
 					>
 				</File>
 				<File
-					RelativePath=".\zlib\ioinbuffer.c"
+					RelativePath="..\common\zlib-1.2.5\ioinbuffer.c"
 					>
 				</File>
 				<File
-					RelativePath=".\zlib\iowin32.c"
+					RelativePath="..\common\zlib-1.2.5\iowin32.c"
 					>
 				</File>
 				<File
-					RelativePath=".\zlib\mztools.c"
+					RelativePath="..\common\zlib-1.2.5\mztools.c"
 					>
 				</File>
 				<File
-					RelativePath=".\zlib\trees.c"
+					RelativePath="..\common\zlib-1.2.5\trees.c"
 					>
 				</File>
 				<File
-					RelativePath=".\zlib\uncompr.c"
+					RelativePath="..\common\zlib-1.2.5\uncompr.c"
 					>
 				</File>
 				<File
-					RelativePath=".\zlib\unzip.c"
+					RelativePath="..\common\zlib-1.2.5\unzip.c"
 					>
 				</File>
 				<File
-					RelativePath=".\zlib\zip.c"
+					RelativePath="..\common\zlib-1.2.5\zip.c"
 					>
 				</File>
 				<File
-					RelativePath=".\zlib\zutil.c"
+					RelativePath="..\common\zlib-1.2.5\zutil.c"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="md5"
+				>
+				<File
+					RelativePath="..\common\md5\md5.cpp"
 					>
 				</File>
 			</Filter>
@@ -284,10 +288,6 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
-			<File
-				RelativePath=".\md5.hpp"
-				>
-			</File>
 			<File
 				RelativePath=".\uncompress.hpp"
 				>
@@ -305,90 +305,98 @@
 				>
 			</File>
 			<Filter
-				Name="tinyxml"
+				Name="zlib"
 				>
 				<File
-					RelativePath=".\tinyxml\tinystr.h"
+					RelativePath="..\common\zlib-1.2.5\crc32.h"
 					>
 				</File>
 				<File
-					RelativePath=".\tinyxml\tinyxml.h"
+					RelativePath="..\common\zlib-1.2.5\crypt.h"
+					>
+				</File>
+				<File
+					RelativePath="..\common\zlib-1.2.5\deflate.h"
+					>
+				</File>
+				<File
+					RelativePath="..\common\zlib-1.2.5\gzguts.h"
+					>
+				</File>
+				<File
+					RelativePath="..\common\zlib-1.2.5\inffast.h"
+					>
+				</File>
+				<File
+					RelativePath="..\common\zlib-1.2.5\inffixed.h"
+					>
+				</File>
+				<File
+					RelativePath="..\common\zlib-1.2.5\inflate.h"
+					>
+				</File>
+				<File
+					RelativePath="..\common\zlib-1.2.5\inftrees.h"
+					>
+				</File>
+				<File
+					RelativePath="..\common\zlib-1.2.5\ioapi.h"
+					>
+				</File>
+				<File
+					RelativePath="..\common\zlib-1.2.5\ioinbuffer.h"
+					>
+				</File>
+				<File
+					RelativePath="..\common\zlib-1.2.5\iowin32.h"
+					>
+				</File>
+				<File
+					RelativePath="..\common\zlib-1.2.5\mztools.h"
+					>
+				</File>
+				<File
+					RelativePath="..\common\zlib-1.2.5\trees.h"
+					>
+				</File>
+				<File
+					RelativePath="..\common\zlib-1.2.5\unzip.h"
+					>
+				</File>
+				<File
+					RelativePath="..\common\zlib-1.2.5\zconf.h"
+					>
+				</File>
+				<File
+					RelativePath="..\common\zlib-1.2.5\zip.h"
+					>
+				</File>
+				<File
+					RelativePath="..\common\zlib-1.2.5\zlib.h"
+					>
+				</File>
+				<File
+					RelativePath="..\common\zlib-1.2.5\zutil.h"
 					>
 				</File>
 			</Filter>
 			<Filter
-				Name="zlib"
+				Name="md5"
 				>
 				<File
-					RelativePath=".\zlib\crc32.h"
+					RelativePath="..\common\md5\md5.hpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="tinyxml"
+				>
+				<File
+					RelativePath="..\common\tinyxml\tinystr.h"
 					>
 				</File>
 				<File
-					RelativePath=".\zlib\crypt.h"
-					>
-				</File>
-				<File
-					RelativePath=".\zlib\deflate.h"
-					>
-				</File>
-				<File
-					RelativePath=".\zlib\gzguts.h"
-					>
-				</File>
-				<File
-					RelativePath=".\zlib\inffast.h"
-					>
-				</File>
-				<File
-					RelativePath=".\zlib\inffixed.h"
-					>
-				</File>
-				<File
-					RelativePath=".\zlib\inflate.h"
-					>
-				</File>
-				<File
-					RelativePath=".\zlib\inftrees.h"
-					>
-				</File>
-				<File
-					RelativePath=".\zlib\ioapi.h"
-					>
-				</File>
-				<File
-					RelativePath=".\zlib\ioinbuffer.h"
-					>
-				</File>
-				<File
-					RelativePath=".\zlib\iowin32.h"
-					>
-				</File>
-				<File
-					RelativePath=".\zlib\mztools.h"
-					>
-				</File>
-				<File
-					RelativePath=".\zlib\trees.h"
-					>
-				</File>
-				<File
-					RelativePath=".\zlib\unzip.h"
-					>
-				</File>
-				<File
-					RelativePath=".\zlib\zconf.h"
-					>
-				</File>
-				<File
-					RelativePath=".\zlib\zip.h"
-					>
-				</File>
-				<File
-					RelativePath=".\zlib\zlib.h"
-					>
-				</File>
-				<File
-					RelativePath=".\zlib\zutil.h"
+					RelativePath="..\common\tinyxml\tinyxml.h"
 					>
 				</File>
 			</Filter>
