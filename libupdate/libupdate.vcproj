@@ -40,7 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../common/tinyxml;../common/md5;../common/zlib-1.2.5"
+				AdditionalIncludeDirectories="./tinyxml;./zlib"
 				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -166,6 +166,118 @@
 				RelativePath=".\url.cpp"
 				>
 			</File>
+			<Filter
+				Name="tinyxml"
+				>
+				<File
+					RelativePath=".\tinyxml\tinystr.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\tinyxml\tinyxml.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\tinyxml\tinyxmlerror.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\tinyxml\tinyxmlparser.cpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="zlib"
+				>
+				<File
+					RelativePath=".\zlib\adler32.c"
+					>
+				</File>
+				<File
+					RelativePath=".\zlib\compress.c"
+					>
+				</File>
+				<File
+					RelativePath=".\zlib\crc32.c"
+					>
+				</File>
+				<File
+					RelativePath=".\zlib\deflate.c"
+					>
+				</File>
+				<File
+					RelativePath=".\zlib\example.c"
+					>
+				</File>
+				<File
+					RelativePath=".\zlib\gzclose.c"
+					>
+				</File>
+				<File
+					RelativePath=".\zlib\gzlib.c"
+					>
+				</File>
+				<File
+					RelativePath=".\zlib\gzread.c"
+					>
+				</File>
+				<File
+					RelativePath=".\zlib\gzwrite.c"
+					>
+				</File>
+				<File
+					RelativePath=".\zlib\infback.c"
+					>
+				</File>
+				<File
+					RelativePath=".\zlib\inffast.c"
+					>
+				</File>
+				<File
+					RelativePath=".\zlib\inflate.c"
+					>
+				</File>
+				<File
+					RelativePath=".\zlib\inftrees.c"
+					>
+				</File>
+				<File
+					RelativePath=".\zlib\ioapi.c"
+					>
+				</File>
+				<File
+					RelativePath=".\zlib\ioinbuffer.c"
+					>
+				</File>
+				<File
+					RelativePath=".\zlib\iowin32.c"
+					>
+				</File>
+				<File
+					RelativePath=".\zlib\mztools.c"
+					>
+				</File>
+				<File
+					RelativePath=".\zlib\trees.c"
+					>
+				</File>
+				<File
+					RelativePath=".\zlib\uncompr.c"
+					>
+				</File>
+				<File
+					RelativePath=".\zlib\unzip.c"
+					>
+				</File>
+				<File
+					RelativePath=".\zlib\zip.c"
+					>
+				</File>
+				<File
+					RelativePath=".\zlib\zutil.c"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="头文件"
@@ -173,15 +285,11 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\inc.h"
+				RelativePath=".\md5.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\md5.h"
-				>
-			</File>
-			<File
-				RelativePath=".\uncompress.h"
+				RelativePath=".\uncompress.hpp"
 				>
 			</File>
 			<File
@@ -189,9 +297,101 @@
 				>
 			</File>
 			<File
+				RelativePath=".\updater_impl.hpp"
+				>
+			</File>
+			<File
 				RelativePath=".\url.hpp"
 				>
 			</File>
+			<Filter
+				Name="tinyxml"
+				>
+				<File
+					RelativePath=".\tinyxml\tinystr.h"
+					>
+				</File>
+				<File
+					RelativePath=".\tinyxml\tinyxml.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="zlib"
+				>
+				<File
+					RelativePath=".\zlib\crc32.h"
+					>
+				</File>
+				<File
+					RelativePath=".\zlib\crypt.h"
+					>
+				</File>
+				<File
+					RelativePath=".\zlib\deflate.h"
+					>
+				</File>
+				<File
+					RelativePath=".\zlib\gzguts.h"
+					>
+				</File>
+				<File
+					RelativePath=".\zlib\inffast.h"
+					>
+				</File>
+				<File
+					RelativePath=".\zlib\inffixed.h"
+					>
+				</File>
+				<File
+					RelativePath=".\zlib\inflate.h"
+					>
+				</File>
+				<File
+					RelativePath=".\zlib\inftrees.h"
+					>
+				</File>
+				<File
+					RelativePath=".\zlib\ioapi.h"
+					>
+				</File>
+				<File
+					RelativePath=".\zlib\ioinbuffer.h"
+					>
+				</File>
+				<File
+					RelativePath=".\zlib\iowin32.h"
+					>
+				</File>
+				<File
+					RelativePath=".\zlib\mztools.h"
+					>
+				</File>
+				<File
+					RelativePath=".\zlib\trees.h"
+					>
+				</File>
+				<File
+					RelativePath=".\zlib\unzip.h"
+					>
+				</File>
+				<File
+					RelativePath=".\zlib\zconf.h"
+					>
+				</File>
+				<File
+					RelativePath=".\zlib\zip.h"
+					>
+				</File>
+				<File
+					RelativePath=".\zlib\zlib.h"
+					>
+				</File>
+				<File
+					RelativePath=".\zlib\zutil.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="资源文件"

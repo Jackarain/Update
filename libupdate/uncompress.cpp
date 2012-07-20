@@ -1,7 +1,7 @@
 #include <direct.h>
 #include <errno.h>
 
-#include "uncompress.h"
+#include "uncompress.hpp"
 
 #ifndef GZ_SUFFIX
 #define GZ_SUFFIX ".gz"
