@@ -584,7 +584,7 @@ void updater::resume()
 
 updater::result_type updater::result()
 {
-	return static_cast<updater::result_type>(m_updater->result());
+	return m_updater->result();
 }
 
 
