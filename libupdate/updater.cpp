@@ -89,15 +89,10 @@ void updater_impl::update_files()
 					// 此处验证压缩文件的md5值, 根据md5进行判断是否下载.
 					std::string md5;
 					if (fs::exists(file_name)) {
-						// 只检查文件是否存在.
-						if (i->second.check) {
-							md5 = i->second.filehash;
-						} else {
-							char md5_buf[33] = { 0 };
-							MDFile((char*)file_name.c_str(), md5_buf);
-							md5 = md5_buf;
-							boost::to_lower(md5);
-						}
+						char md5_buf[33] = { 0 };
+						MDFile((char*)file_name.c_str(), md5_buf);
+						md5 = md5_buf;
+						boost::to_lower(md5);
 					}
 					// 比较md5.
 					if (md5 != i->second.filehash || i->second.filehash == "") {
@@ -175,7 +170,7 @@ void updater_impl::update_files()
 						MDFile((char*)target_file.c_str(), md5_buf);
 						std::string md5 = md5_buf;
 						boost::to_lower(md5);
-						if (md5 != i->second.md5) {
+						if (md5 != i->second.md5 && !i->second.check) {
 							fs::rename(fs::path(target_file), fs::path(target_file + ".bak"));
 							fs::copy_file(fs::path(file_name), fs::path(target_file), fs::copy_option::overwrite_if_exists);
 						}
