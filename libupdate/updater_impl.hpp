@@ -105,7 +105,6 @@ private:
 	int m_total_read_bytes;
 	boost::asio::io_service m_io_service;
 	boost::weak_ptr<tcp::socket> m_sock;
-	// boost::shared_ptr<boost::asio::io_service> m_io_service;
 	bool m_abort;
 	bool m_paused;
 	updater::result_type m_result;
