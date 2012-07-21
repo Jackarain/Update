@@ -125,6 +125,7 @@ typedef struct
 	CString strUrl;         // 下载的url,默认为空.
 	CString strCommand;     // 命令.
 	CString strCompress;    // 压缩选项.
+	BOOL isCheckExist;		// 更新时不检查文件MD5, 只检查文件是否存在, 如果不存在才更新.
 	DWORD dwSize;           // 大小.
 	LONGLONG lVersion;      // 文件版本.
 } XMLNODEINFO, *PXMLNODEINFO;

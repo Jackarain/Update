@@ -177,12 +177,12 @@ LRESULT CMainDlg::OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam
 	// 设置列.
 	m_ctlList.InsertColumn(1, _T("文件名"), LVCFMT_LEFT, 240);		// emName
 	m_ctlList.InsertColumn(2, _T("文件版本"), LVCFMT_LEFT, 100);	// emVer
-	m_ctlList.InsertColumn(3, _T("文件MD5"), LVCFMT_LEFT, 240);	// emHash
-	m_ctlList.InsertColumn(4, _T("压缩文件MD5"), LVCFMT_LEFT, 240);	// emUpdateHash
+	m_ctlList.InsertColumn(3, _T("文件MD5"), LVCFMT_LEFT, 210);	// emHash
+	m_ctlList.InsertColumn(4, _T("压缩文件MD5"), LVCFMT_LEFT, 210);	// emUpdateHash
 	m_ctlList.InsertColumn(5, _T("大小"), LVCFMT_LEFT, 140);		// emSize
-	m_ctlList.InsertColumn(6, _T("注册为COM"), LVCFMT_LEFT, 100);	// emRegsvr
+	m_ctlList.InsertColumn(6, _T("COM注册"), LVCFMT_LEFT, 65);	// emRegsvr
 	m_ctlList.InsertColumn(7, _T("压缩方式"), LVCFMT_LEFT, 100);	// emCompress
-	// m_ctlList.InsertColumn(8, _T("检查存在"), LVCFMT_LEFT, 100);	// emFileExist
+	m_ctlList.InsertColumn(8, _T("检查存在"), LVCFMT_LEFT, 100);	// emFileExist
 	m_ctlList.InsertColumn(9, _T("自定义URL"), LVCFMT_LEFT, 600);	// emUrl
 	m_ctlList.InsertColumn(10, _T("完整文件名"), LVCFMT_LEFT, 0);	// emFullPath
 
@@ -543,6 +543,23 @@ LRESULT CMainDlg::OnNMDblclkListHash(int /*idCtrl*/, LPNMHDR pNMHDR, BOOL& /*bHa
 			return 0;
 		}
 
+		m_ctlList.GetSubItemRect(nSel, emFileExist, 0, &rcRect);
+		m_ctlList.ClientToScreen(&rcRect);
+		if (rcRect.PtInRect(ptCursor))				// 判断是否双击在只检查文件列.
+		{
+			m_ctlList.GetItemText(nSel, emFileExist, strText);
+			if (strText == _T(""))
+			{
+				m_ctlList.SetItemText(m_ctlList.GetNextItem(-1, LVNI_SELECTED), emFileExist, _T("是"));
+			}
+			else
+			{
+				m_ctlList.SetItemText(m_ctlList.GetNextItem(-1, LVNI_SELECTED), emFileExist, _T(""));
+			}
+
+			return 0;
+		}
+
 		m_ctlList.GetSubItemRect(nSel, emCompress, 0, &rcRect);
 		m_ctlList.ClientToScreen(&rcRect);
       if (rcRect.PtInRect(ptCursor))				// 判断是否双击在压缩选择列.
@@ -780,6 +797,18 @@ void CMainDlg::GenXmlFile()
          m_thCompress.CreateFileNested(strNewName);
          CopyFile(strFileName, strNewName, FALSE);
       }
+
+		// 只检测文件存在.
+		m_ctlList.GetItemText(n, emFileExist, strText);
+		if (strText == _T(""))
+		{
+			xml.isCheckExist = FALSE;
+		}
+		else
+		{
+			xml.isCheckExist = TRUE;
+			fileElement->SetAttribute("check", 1);
+		}
 
       // 计算压缩文件的md5值.
       char szMd5[33] = "";

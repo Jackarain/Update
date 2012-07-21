@@ -55,6 +55,7 @@ public:
 		std::string url;              // 下载的url, 默认为空.
 		std::string command;          // 命令.
 		std::string compress;         // 压缩选项.
+		bool check;							// 文件检查选项, 如果为ture, 则表示不比较MD5, 只当文件不存在时才更新.
 		boost::uint32_t size;         // 大小.
 	} xml_node_info;
 

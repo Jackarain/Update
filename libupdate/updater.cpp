@@ -87,17 +87,24 @@ void updater_impl::update_files()
 					temp_path = temp_path / u.filename();
 					file_name = temp_path.string();
 					// 此处验证压缩文件的md5值, 根据md5进行判断是否下载.
-					char md5_buf[33] = { 0 };
-					MDFile((char*)file_name.c_str(), md5_buf);
-					std::string md5 = md5_buf;
-					boost::to_lower(md5);
+					std::string md5;
+					if (fs::exists(file_name)) {
+						// 只检查文件是否存在.
+						if (i->second.check) {
+							md5 = i->second.filehash;
+						} else {
+							char md5_buf[33] = { 0 };
+							MDFile((char*)file_name.c_str(), md5_buf);
+							md5 = md5_buf;
+							boost::to_lower(md5);
+						}
+					}
 					// 比较md5.
-					if (md5 != i->second.filehash ||
-						i->second.filehash == "") {
-							if (!file_down_load(i->second.url, file_name, i->second, extera_header)) {
-								std::cout << "download file \'" << file_name.c_str() << "\'failed!\n";
-								return ;
-							}
+					if (md5 != i->second.filehash || i->second.filehash == "") {
+						if (!file_down_load(i->second.url, file_name, i->second, extera_header)) {
+							std::cout << "download file \'" << file_name.c_str() << "\'failed!\n";
+							return ;
+						}
 					}
 					m_current_index++;
 			}
@@ -440,7 +447,7 @@ bool updater_impl::parser_xml_file(const std::string& file)
 			if (element) {
 				char* item = NULL;
 				xml_node_info xml = { std::string(""), std::string(""), std::string(""), 
-					std::string(""), std::string(""), std::string(""), 0 };
+					std::string(""), std::string(""), std::string(""), false, 0 };
 
 				if (element->Attribute("name"))
 					xml.name = element->Attribute("name");
@@ -456,6 +463,8 @@ bool updater_impl::parser_xml_file(const std::string& file)
 					xml.command = element->Attribute("command");
 				if (element->Attribute("compress"))
 					xml.compress = element->Attribute("compress");
+				if (element->Attribute("check"))
+					xml.check = true;
 				if (element->Attribute("size")) {
 					xml.size = atol(element->Attribute("size"));
 					m_upfile_total_size += xml.size;
