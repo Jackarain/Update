@@ -233,7 +233,8 @@ class CMainDlg : public CResizableDialogImpl<CMainDlg>,
 				 public CMessageFilter, public CIdleHandler
 {
 	typedef CResizableDialogImpl<CMainDlg> baseClass;
-	typedef enum {emName, emVer, emHash, emUpdateHash, emSize, emRegsvr, emCompress, emUrl, emFullPath} listColumn;
+	typedef enum {emName, emVer, emHash, emUpdateHash, emSize,
+		emRegsvr, emCompress, /*emFileExist, */emUrl, emFullPath} listColumn;
 	friend class CListEx;
 public:
 	CMainDlg() : m_thCheck(), m_thCompress() 

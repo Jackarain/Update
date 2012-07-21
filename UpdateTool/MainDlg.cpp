@@ -178,12 +178,13 @@ LRESULT CMainDlg::OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam
 	m_ctlList.InsertColumn(1, _T("文件名"), LVCFMT_LEFT, 240);		// emName
 	m_ctlList.InsertColumn(2, _T("文件版本"), LVCFMT_LEFT, 100);	// emVer
 	m_ctlList.InsertColumn(3, _T("文件MD5"), LVCFMT_LEFT, 240);	// emHash
-	m_ctlList.InsertColumn(4, _T("更新文件MD5"), LVCFMT_LEFT, 240);	// emUpdateHash
+	m_ctlList.InsertColumn(4, _T("压缩文件MD5"), LVCFMT_LEFT, 240);	// emUpdateHash
 	m_ctlList.InsertColumn(5, _T("大小"), LVCFMT_LEFT, 140);		// emSize
 	m_ctlList.InsertColumn(6, _T("注册为COM"), LVCFMT_LEFT, 100);	// emRegsvr
-	m_ctlList.InsertColumn(7, _T("是否压缩"), LVCFMT_LEFT, 100);	// emCompress
-	m_ctlList.InsertColumn(8, _T("自定义URL"), LVCFMT_LEFT, 600);	// emUrl
-	m_ctlList.InsertColumn(9, _T("完整文件名"), LVCFMT_LEFT, 0);	// emFullPath
+	m_ctlList.InsertColumn(7, _T("压缩方式"), LVCFMT_LEFT, 100);	// emCompress
+	// m_ctlList.InsertColumn(8, _T("检查存在"), LVCFMT_LEFT, 100);	// emFileExist
+	m_ctlList.InsertColumn(9, _T("自定义URL"), LVCFMT_LEFT, 600);	// emUrl
+	m_ctlList.InsertColumn(10, _T("完整文件名"), LVCFMT_LEFT, 0);	// emFullPath
 
 	// 设置控件位置.
 	AddAnchor(GetDlgItem(IDC_TEXT_SEL_SETUP), TOP_LEFT, TOP_RIGHT);
@@ -321,21 +322,17 @@ LRESULT CMainDlg::OnCheckFileComplete(UINT /*uMsg*/, WPARAM wParam, LPARAM lPara
 		m_thCheck.GetFileList(m_lstXmlInfo);
 
 	if (m_strInPath.Right(1) != _T("\\"))
-	{
 		strPath = m_strInPath + _T('\\');
-	}
 
 	if (!m_bDropFiles)
 		m_ctlList.DeleteAllItems();
 
 	// 截出多余部分.
-	for (ListXml::iterator it = m_lstXmlInfo.begin(); it != m_lstXmlInfo.end(); it++)
-	{
+	for (ListXml::iterator it = m_lstXmlInfo.begin(); it != m_lstXmlInfo.end(); it++) {
 		it->strFullPath = it->strName;
 		if (strPath !=  _T("\\"))
 			it->strName.Replace(strPath, _T(''));
-		if (m_bDropFiles)
-		{
+		if (m_bDropFiles) {
 			TCHAR szDir[MAX_PATH];  
 			_tcscpy_s(szDir, it->strFullPath.GetBuffer(0));
 			PathRemoveFileSpec(szDir);
