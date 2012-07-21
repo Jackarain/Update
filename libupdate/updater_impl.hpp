@@ -16,6 +16,7 @@
 #include "url.hpp"
 #include "md5.hpp"
 #include "tinyxml.h"
+#include "updater.hpp"
 
 #include <stdio.h>
 #include <string.h>
@@ -28,12 +29,15 @@
 #include <boost/asio.hpp>
 using boost::asio::ip::tcp;
 
+#include <boost/weak_ptr.hpp>
+#include <boost/shared_ptr.hpp>
 #include <boost/bind.hpp>
 #include <boost/thread.hpp>
 #include <boost/function.hpp>
 #include <boost/filesystem.hpp>
 namespace fs = boost::filesystem;
 #include <boost/algorithm/string.hpp>
+
 
 #pragma once
 
@@ -64,11 +68,12 @@ public:
 	virtual ~updater_impl(void);
 
 public:
-	bool start(const std::string& url, fun_down_load_callback dl, 
+	bool start(const std::string& url, fun_check_files_callback fc, fun_down_load_callback dl,
 		fun_check_files_callback cf, fun_update_files_process uf, std::string setup_path);
 	void stop();
 	void pause();
 	void resume();
+	updater::result_type result();
 
 protected:
 	// 更新.
@@ -76,7 +81,8 @@ protected:
 	bool parser_xml_file(const std::string& file);
 
 	// 文件下载.
-	bool file_down_load(const url& url, const std::string& file, xml_node_info& info, const std::string& extera_header = "");
+	bool file_down_load(const url& url, const std::string& file,
+		xml_node_info& info, const std::string& extera_header = "");
 	void down_load_callback(std::string file, int count, int index, 
 		int total_size, int total_read_bytes, int file_size, int read_bytes);
 
@@ -84,6 +90,7 @@ protected:
 	bool parser_http_last_modified(const std::string& str, struct tm* time);
 
 private:
+	fun_check_files_callback m_setup_file_check;
 	fun_down_load_callback m_down_load_fun;
 	fun_check_files_callback m_fun_check_files;
 	fun_update_files_process m_update_files_fun;
@@ -92,11 +99,16 @@ private:
 	std::string m_setup_path;
 	boost::thread m_update_thrd;
 	std::map<std::string, xml_node_info> m_update_file_list;
+	std::map<std::string, xml_node_info> m_need_update_list;
 	boost::uint64_t m_upfile_total_size;
 	int m_current_index;
 	int m_total_read_bytes;
+	boost::asio::io_service m_io_service;
+	boost::weak_ptr<tcp::socket> m_sock;
+	// boost::shared_ptr<boost::asio::io_service> m_io_service;
 	bool m_abort;
 	bool m_paused;
+	updater::result_type m_result;
 };
 
 #endif // __UPDATER_IMPL_H__

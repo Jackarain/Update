@@ -1,8 +1,10 @@
 #include "updater_impl.hpp"
 #include "uncompress.hpp"
 
+
 updater_impl::updater_impl(void)
 {
+	m_result = updater::st_error;
 }
 
 updater_impl::~updater_impl(void)
@@ -10,20 +12,24 @@ updater_impl::~updater_impl(void)
 	stop();
 }
 
-bool updater_impl::start(const std::string& url, fun_down_load_callback dl, 
+bool updater_impl::start(const std::string& url, fun_check_files_callback fc, fun_down_load_callback dl,
 	fun_check_files_callback cf, fun_update_files_process uf, std::string setup_path)
 {
+	m_setup_file_check = fc;
 	m_down_load_fun = dl;
 	m_fun_check_files = cf;
 	m_update_files_fun = uf;
 	m_url = url;
-	m_upfile_total_size = -1;
+	m_upfile_total_size = 0;
 	m_current_index = 0;
 	m_total_read_bytes = 0;
 	m_setup_path = setup_path;
 	m_is_downloading = false;
 	m_abort = false;
 	m_paused = false;
+	m_result = updater::st_updating;
+	m_need_update_list.clear();
+	m_update_file_list.clear();
 
 	if (url.empty())
 		return false;
@@ -37,6 +43,14 @@ void updater_impl::stop()
 	if (m_abort)
 		return ;
 	m_abort = true;
+	boost::shared_ptr<tcp::socket> sock_ptr = m_sock.lock();
+	if (sock_ptr) {
+		boost::system::error_code ec;
+		sock_ptr->cancel(ec);
+		sock_ptr->shutdown(tcp::socket::shutdown_both, ec);
+		sock_ptr->close(ec);
+	}
+
 	m_update_thrd.join();
 }
 
@@ -57,6 +71,7 @@ void updater_impl::update_files()
 	{
 		std::string file_name;
 		std::string target_file;
+		char md5_buf[33] = { 0 };
 		url u = m_url;
 
 		// 得到临时文件夹路径.
@@ -65,21 +80,45 @@ void updater_impl::update_files()
 		std::string extera_header = make_http_last_modified(file_name);
 		xml_node_info info;
 		// 下载xml文件到临时文件夹.
+		m_current_index = 0;
 		if (file_down_load(u, file_name, info, extera_header)) {
 			// 解析xml文件.
 			if (!parser_xml_file(file_name)) {
 				std::cout << "parser xml file failed!\n";
+				m_result = updater::st_error;
 				return ;
+			}
+			// 得到需要更新的文件列表.
+			for (std::map<std::string, xml_node_info>::iterator i = m_update_file_list.begin();
+				i != m_update_file_list.end(); i++) {
+					if (m_setup_file_check)
+						m_setup_file_check(i->first, m_update_file_list.size(), m_current_index++);
+				fs::path p = fs::path(m_setup_path) / i->second.name;
+				if (!fs::exists(p)) {
+					m_need_update_list.insert(std::make_pair(i->first, i->second));
+					m_upfile_total_size += i->second.size;
+					continue;
+				}
+				std::string md5;
+				memset(md5_buf, 0, 33);
+				MDFile((char*)p.string().c_str(), md5_buf);
+				md5 = md5_buf;
+				boost::to_lower(md5);
+				if (md5 != i->second.md5 || i->second.md5.empty()) {
+					m_need_update_list.insert(std::make_pair(i->first, i->second));
+					m_upfile_total_size += i->second.size;
+				}
 			}
 			extera_header = "";
 			m_is_downloading = true;
+			m_current_index = 0;
 			// 根据xml下载各文件.
-			for (std::map<std::string, xml_node_info>::iterator i = m_update_file_list.begin();
-				i != m_update_file_list.end(); i++) {
+			for (std::map<std::string, xml_node_info>::iterator i = m_need_update_list.begin();
+				i != m_need_update_list.end(); i++) {
 					if (m_abort)
 						return ;
 					if (m_paused) {
-						while (m_paused) 
+						while (m_paused)
 							boost::this_thread::sleep(boost::posix_time::millisec(100));
 					}
 					u = i->second.url;
@@ -100,14 +139,16 @@ void updater_impl::update_files()
 							std::cout << "download file \'" << file_name.c_str() << "\'failed!\n";
 							return ;
 						}
+					} else {
+						m_total_read_bytes += i->second.size;
 					}
 					m_current_index++;
 			}
 			m_is_downloading = false;
 			m_current_index = 0;
 			// 解压并检查下载文件的md5值.
-			for (std::map<std::string, xml_node_info>::iterator i = m_update_file_list.begin();
-				i != m_update_file_list.end(); i++) {
+			for (std::map<std::string, xml_node_info>::iterator i = m_need_update_list.begin();
+				i != m_need_update_list.end(); i++) {
 					if (m_abort)
 						return ;
 					if (m_paused) {
@@ -123,12 +164,14 @@ void updater_impl::update_files()
 						if (i->second.compress == "gz") {
 							if (do_extract_gz(file_name.c_str()) != 0) {
 								std::cout << "extract gz file \'" << file_name.c_str() << "\'failed!\n";
+								m_result = updater::st_error;
 								return ;
 							}
 						} else if (i->second.compress == "zip") {
 							std::string str_path = (temp_path.parent_path() / "./").string();
 							if (do_extract_zip(file_name.c_str(), str_path.c_str()) != 0) {
 								std::cout << "extract zip file \'" << file_name.c_str() << "\'failed!\n";
+								m_result = updater::st_error;
 								return ;
 							}
 						}
@@ -147,13 +190,13 @@ void updater_impl::update_files()
 						return ;
 					}
 					if (m_fun_check_files)
-						m_fun_check_files(i->first, m_update_file_list.size(), m_current_index++);
+						m_fun_check_files(i->first, m_need_update_list.size(), m_current_index++);
 			}
 			// 复制安装.
 			m_current_index = 0;
 			is_need_rollback = true;
-			for (std::map<std::string, xml_node_info>::iterator i = m_update_file_list.begin();
-				i != m_update_file_list.end(); i++) {
+			for (std::map<std::string, xml_node_info>::iterator i = m_need_update_list.begin();
+				i != m_need_update_list.end(); i++) {
 					if (m_abort)
 						throw std::exception("user abort!"); // for rollback.
 					if (m_paused) {
@@ -180,7 +223,7 @@ void updater_impl::update_files()
 					if (!i->second.command.empty())
 						system(i->second.command.c_str());
 					if (m_update_files_fun)
-						m_update_files_fun(i->first, m_update_file_list.size(), m_current_index++);
+						m_update_files_fun(i->first, m_need_update_list.size(), m_current_index++);
 			}
 			// 清理bak文件.
 			is_need_rollback = false;
@@ -205,6 +248,11 @@ void updater_impl::update_files()
 						remove(fs::path(target_file), ec); // 忽略错误.
 					}
 			}
+			// 修改更新结果状态.
+			if (m_need_update_list.size() == 0)
+				m_result = updater::st_no_need_update;
+			else
+				m_result = updater::st_succeed;
 		} else {
 			std::cout << "download xml file failed!\n";
 			return ;
@@ -213,6 +261,7 @@ void updater_impl::update_files()
 	catch (std::exception& e)
 	{
 		std::cout << "exception: " << e.what() << std::endl;
+		m_result = updater::st_error;
 		if (is_need_rollback) {
 			// 回滚操作.
 			for (std::map<std::string, xml_node_info>::iterator i = m_update_file_list.begin();
@@ -231,8 +280,7 @@ bool updater_impl::file_down_load(const url& url, const std::string& file,
 {
 	time_t last_modified_time = 0;
 
-	try
-	{
+	try {
 		std::fstream fs;
 
 		// 创建目录.
@@ -242,15 +290,29 @@ bool updater_impl::file_down_load(const url& url, const std::string& file,
 				return false;
 		}
 
-		boost::asio::io_service io_service;
+		boost::asio::io_service &io_service = m_io_service;
 		tcp::resolver resolver(io_service);
 		char buffer[4096] = { 0 };
 		sprintf(buffer, "%d", url.port());
 		tcp::resolver::query query(url.host().c_str(), buffer);
 		tcp::resolver::iterator endpoint_iterator = resolver.resolve(query);
+		tcp::resolver::iterator end;
 
-		tcp::socket socket(io_service);
-		boost::asio::connect(socket, endpoint_iterator);
+		boost::shared_ptr<tcp::socket> sock_ptr(new tcp::socket(io_service));
+		m_sock = sock_ptr;
+		tcp::socket &socket = *sock_ptr.get();
+
+		boost::system::error_code error = boost::asio::error::host_not_found;
+		while (error && endpoint_iterator != end) {
+			socket.close();
+			socket.connect(*endpoint_iterator++, error);
+		}
+
+		// 连接失败.
+		if (error) {
+			m_result = updater::st_unable_to_connect;
+			return false;
+		}
 
 		boost::asio::streambuf request;
 		std::ostream request_stream(&request);
@@ -277,6 +339,7 @@ bool updater_impl::file_down_load(const url& url, const std::string& file,
 
 		if (!response_stream || http_version.substr(0, 5) != "HTTP/") {
 			std::cout << "Invalid response\n";
+			m_result = updater::st_invalid_http_response;
 			return false;
 		}
 		std::cout << "Response returned with status code " << status_code << "\n";
@@ -284,15 +347,16 @@ bool updater_impl::file_down_load(const url& url, const std::string& file,
 			if (status_code == 304) {
 				if (m_is_downloading) {
 					std::map<std::string, xml_node_info>::iterator finder = 
-						m_update_file_list.find(info.name);
-					if (finder != m_update_file_list.end()) {
+						m_need_update_list.find(info.name);
+					if (finder != m_need_update_list.end()) {
 						m_total_read_bytes += finder->second.size;
-						down_load_callback(url.filename(), m_update_file_list.size(), m_current_index, 
+						down_load_callback(url.filename(), m_need_update_list.size(), m_current_index, 
 							m_upfile_total_size, m_total_read_bytes, finder->second.size, finder->second.size);
 					}
 				}
 				goto SUCCESS_FLAG;
 			}
+			m_result = updater::st_invalid_http_response;
 			return false;
 		}
 
@@ -330,8 +394,10 @@ bool updater_impl::file_down_load(const url& url, const std::string& file,
 
 		// 创建文件.
 		fs.open(file.c_str(), std::ios::trunc | std::ios::in | std::ios::out | std::ios::binary);
-		if (fs.bad() || fs.fail())
+		if (fs.bad() || fs.fail()) {
+			m_result = updater::st_open_file_failed;
 			return false;
+		}
 
 		// Write whatever content we already have to output.
 		while (response.size() > 0) {
@@ -353,7 +419,6 @@ bool updater_impl::file_down_load(const url& url, const std::string& file,
 			goto SUCCESS_FLAG;
 
 		// Read until EOF, writing data to output as we go.
-		boost::system::error_code error;
 		while (boost::asio::read(socket, response,
 			boost::asio::transfer_at_least(1), error))
 		{
@@ -382,8 +447,7 @@ bool updater_impl::file_down_load(const url& url, const std::string& file,
 
 		fs.close();
 		goto SUCCESS_FLAG;
-	}
-	catch (std::exception& e) {
+	} catch (std::exception& e) {
 		std::cout << e.what() << std::endl;
 		return false;
 	}
@@ -411,8 +475,7 @@ void updater_impl::down_load_callback(std::string file, int count, int index,
 	if (m_abort)
 		return ;
 
-	if (m_down_load_fun)
-	{
+	if (m_down_load_fun) {
 		m_down_load_fun(file, count, index, 
 			total_size, total_read_bytes, file_size, read_bytes);
 	}
@@ -462,7 +525,6 @@ bool updater_impl::parser_xml_file(const std::string& file)
 					xml.check = true;
 				if (element->Attribute("size")) {
 					xml.size = atol(element->Attribute("size"));
-					m_upfile_total_size += xml.size;
 				}
 
 				m_update_file_list.insert(std::make_pair(xml.name, xml));
@@ -484,22 +546,25 @@ bool updater_impl::parser_xml_file(const std::string& file)
 	return false;
 }
 
-#include "updater.hpp"
+updater::result_type updater_impl::result()
+{
+	return m_result;
+}
+
 
 updater::updater()
 	: m_updater(new updater_impl())
-{
-}
+{}
 
 updater::~updater()
 {
 	delete m_updater;	
 }
 
-bool updater::start(const std::string& url, fun_down_load_callback dl,
+bool updater::start(const std::string& url, fun_check_files_callback fc, fun_down_load_callback dl,
 	fun_check_files_callback cf, fun_update_files_process uf, std::string setup_path)
 {
-	return m_updater->start(url, dl, cf, uf, setup_path);
+	return m_updater->start(url, fc, dl, cf, uf, setup_path);
 }
 
 void updater::stop()
@@ -517,6 +582,10 @@ void updater::resume()
 	m_updater->resume();
 }
 
+updater::result_type updater::result()
+{
+	return static_cast<updater::result_type>(m_updater->result());
+}
 
 
 

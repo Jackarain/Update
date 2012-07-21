@@ -562,7 +562,7 @@ bool updater_impl::parser_http_last_modified(const std::string& str, struct tm* 
    std::string date;
    time_t t;
 
-   int pos = str.find(':');
+   std::size_t pos = str.find(':');
    if (pos != std::string::npos)
       date = str.substr(pos + 1, str.length() - pos);
    else
