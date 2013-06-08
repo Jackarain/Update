@@ -177,8 +177,8 @@ url url::from_string(const char* s, boost::system::error_code& ec)
       std::string tmp_path;
       if (!unescape_path(new_url.path_, tmp_path))
       {
-         ec = make_error_code(boost::system::errc::invalid_argument);
-         return url();
+         // ec = make_error_code(boost::system::errc::invalid_argument);
+         // return url();
       }
       // file name.
       int pos = new_url.path_.rfind('/') + 1;

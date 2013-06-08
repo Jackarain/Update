@@ -68,13 +68,13 @@ LRESULT CListEx::OnKeyDown(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandl
 
 void CMainDlg::AddFiles(ListXml& t, path const& p, path const& l, DWORD& s)
 {
-	if (l.leaf()[0] == '.')
+	if (l.leaf().string()[0] == '.')
 		return ;
 	path f(p / l);
 	if (is_directory(f))
 	{
 		for (directory_iterator i(f), end; i != end; ++i)
-			AddFiles(t, p, l / i->leaf(), s);
+			AddFiles(t, p, l / i->path().leaf(), s);
 	}
 	else
 	{

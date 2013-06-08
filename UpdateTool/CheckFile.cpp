@@ -128,13 +128,13 @@ int CCheckFile::CompareVersion(LPCTSTR szFile1, LPCTSTR szFile2)
 
 void CCheckFile::AddFiles(ListXml& t, path const& p, path const& l)
 {
-    if (l.leaf()[0] == '.')
+    if (l.leaf().string()[0] == '.')
         return ;
     path f(p / l);
     if (is_directory(f))
     {
         for (directory_iterator i(f), end; i != end; ++i)
-            AddFiles(t, p, l / i->leaf());
+            AddFiles(t, p, l / i->path().leaf());
     }
     else
     {
@@ -179,13 +179,13 @@ void CCheckFile::AddFiles(ListXml& t, path const& p, path const& l)
 
 void CCheckFile::CountFileSum(path const& p, path const& l)
 {
-    if (l.leaf()[0] == '.')
+    if (l.leaf().string()[0] == '.')
         return ;
     path f(p / l);
     if (is_directory(f))
     {
         for (directory_iterator i(f), end; i != end; ++i)
-            CountFileSum(p, l / i->leaf());
+            CountFileSum(p, l / i->path().leaf());
     }
     else
     {
