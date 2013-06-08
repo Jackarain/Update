@@ -1,7 +1,7 @@
 Update
 ======
 
-一个用于更新的解决方案.
+一个用于更新的解决方案(暂时only windows).
 
 UpdateTool	项目是用于生成更新的工具. 比如有文件 main.exe, main.ini, main.dll, 可以生成main.exe.zip, main.ini.zip, main.dll.zip, filelist.xml, 然后可以将这些文件复制到一个http服务器.
 
