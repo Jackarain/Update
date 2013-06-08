@@ -266,7 +266,7 @@ LRESULT CMainDlg::OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam
 	AddAnchor(GetDlgItem(IDC_EDIT_URL), TOP_LEFT, TOP_RIGHT);
 
 	// 设置窗口可以接收文件.
-	DragAcceptFiles(TRUE);
+	// DragAcceptFiles(TRUE);
 	m_bDropFiles = FALSE;
 
 	CString strOutPath;
@@ -493,7 +493,7 @@ LRESULT CMainDlg::OnDropfiles(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, B
 			xml.strMd5.Trim();
 			xml.strCommand = _T("");
 			// 是否需要注册.
-			HINSTANCE hLib = LoadLibrary(xml.strName);
+			HINSTANCE hLib = LoadLibraryEx(xml.strName, NULL, DONT_RESOLVE_DLL_REFERENCES);
 			if (hLib)
 			{
 				if (GetProcAddress(hLib, "DllRegisterServer"))
@@ -820,6 +820,9 @@ void CMainDlg::GenXmlFile()
       nPos = strText.Find(_T("zip"));
       if (nPos != -1)
          xml.strCompress = _T("zip");
+
+	  if (strText == _T(""))
+		  xml.strCompress = "";
 
       // 压缩文件到目标文件夹.
       strFileDir = xml.strFullPath;
