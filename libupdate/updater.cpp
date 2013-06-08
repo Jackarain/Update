@@ -81,7 +81,7 @@ void updater_impl::update_files()
 		xml_node_info info;
 		// 下载xml文件到临时文件夹.
 		m_current_index = 0;
-		if (file_down_load(u, file_name, info, extera_header)) {
+		if (file_down_load(m_url, file_name, info, extera_header)) {
 			// 解析xml文件.
 			if (!parser_xml_file(file_name)) {
 				std::cout << "parser xml file failed!\n";
@@ -275,10 +275,11 @@ void updater_impl::update_files()
 	}
 }
 
-bool updater_impl::file_down_load(const url& url, const std::string& file, 
+bool updater_impl::file_down_load(const std::string& u, const std::string& file, 
 	xml_node_info& info, const std::string& extera_header/* = ""*/)
 {
 	time_t last_modified_time = 0;
+	url url = u;
 
 	try {
 		std::fstream fs;
@@ -316,9 +317,8 @@ bool updater_impl::file_down_load(const url& url, const std::string& file,
 
 		boost::asio::streambuf request;
 		std::ostream request_stream(&request);
-		std::string get_str = url.path() + url.query();
 
-		request_stream << "GET " << get_str.c_str() << " HTTP/1.0\r\n";
+		request_stream << "GET " << u << " HTTP/1.0\r\n";
 		request_stream << "Host: " << url.host() << "\r\n";
 		request_stream << "Accept: */*\r\n";
 		if (!extera_header.empty())

@@ -81,7 +81,7 @@ protected:
 	bool parser_xml_file(const std::string& file);
 
 	// ÎÄ¼şÏÂÔØ.
-	bool file_down_load(const url& url, const std::string& file,
+	bool file_down_load(const std::string& u, const std::string& file,
 		xml_node_info& info, const std::string& extera_header = "");
 	void down_load_callback(std::string file, int count, int index, 
 		int total_size, int total_read_bytes, int file_size, int read_bytes);
