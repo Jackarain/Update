@@ -8,6 +8,71 @@
 #include "aboutdlg.h"
 #include "MainDlg.h"
 
+#include <boost/locale.hpp>
+#include <boost/locale/utf.hpp>
+
+// 默认字符集编码.
+static const std::string default_characters = "GBK";
+static const char hex_chars[] = "0123456789abcdef";
+
+inline bool is_char(int c)
+{
+	return c >= 0 && c <= 127;
+}
+
+inline void to_hex(char const *in, int len, char *out)
+{
+	for (char const *end = in + len; in < end; ++in)
+	{
+		*out++ = hex_chars[((unsigned char)*in) >> 4];
+		*out++ = hex_chars[((unsigned char)*in) & 0xf];
+	}
+	*out = '\0';
+}
+
+inline std::string to_hex(std::string const &s)
+{
+	std::string ret;
+	for (std::string::const_iterator i = s.begin(); i != s.end(); ++i)
+	{
+		ret += hex_chars[((unsigned char)*i) >> 4];
+		ret += hex_chars[((unsigned char)*i) & 0xf];
+	}
+	return ret;
+}
+
+inline std::string escape_path(const std::string &s)
+{
+	std::string ret;
+	std::string h;
+
+	for (std::string::const_iterator i = s.begin(); i != s.end(); i++)
+	{
+		h = *i;
+		if (!is_char(*i))
+			h = "%" + to_hex(h);
+		if (*i == 0x20)
+			h = "%" + to_hex(h);
+		ret += h;
+	}
+
+	return ret;
+}
+
+inline std::string ansi_utf8(
+	std::string const &source, const std::string &characters = default_characters);
+
+inline std::string ansi_utf8(
+	std::string const &source, const std::string &characters/* = default_characters*/)
+{
+	std::string destination;
+
+	destination = boost::locale::conv::between(source, "UTF-8", characters);
+
+	return destination;
+}
+
+
 BOOL CListEx::InitListCtrlEx()
 {
 	m_dwSelected = -1;
@@ -871,7 +936,9 @@ void CMainDlg::GenXmlFile()
 #else
       strTemp = strText.GetBuffer(0);
 #endif
-      strText == _T("") ? NULL : fileElement->SetAttribute("url", strTemp.c_str());
+      std::string utf8 = ansi_utf8(strTemp);
+      utf8 = escape_path(utf8);
+      strText == _T("") ? NULL : fileElement->SetAttribute("url", utf8.c_str());
 
       // 更新到容器.
       m_lstXmlInfo.push_back(xml);
