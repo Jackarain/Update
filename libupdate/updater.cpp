@@ -458,7 +458,7 @@ bool updater_impl::file_down_load(const std::string& u, const std::string& file,
 		}
 
 		if (error != boost::asio::error::eof)
-			throw boost::system::system_error(error);
+			return false;
 
 		fs.close();
 		goto SUCCESS_FLAG;
