@@ -1,6 +1,8 @@
 #include "updater_impl.hpp"
 #include "uncompress.hpp"
-
+#ifdef WIN32
+#include <windows.h>
+#endif // WIN32
 
 updater_impl::updater_impl(void)
 {
@@ -220,8 +222,13 @@ void updater_impl::update_files()
 					} else {
 						fs::copy_file(fs::path(file_name), fs::path(target_file), fs::copy_option::overwrite_if_exists);
 					}
-					if (!i->second.command.empty())
+					if (!i->second.command.empty()) {
+					#ifdef WIN32
+						WinExec(i->second.command.c_str(), SW_HIDE);
+					#else
 						system(i->second.command.c_str());
+					#endif // WIN32
+					}
 					if (m_update_files_fun)
 						m_update_files_fun(i->first, m_need_update_list.size(), m_current_index++);
 			}
@@ -238,9 +245,17 @@ void updater_impl::update_files()
 					// Ö´ÐÐÃüÁî.
 					if (i->second.command == "regsvr") {
 						std::string cmd = "regsvr32.exe /s " + (fs::path(m_setup_path) / i->first).string();
+					#ifdef WIN32
+						WinExec(cmd.c_str(), SW_HIDE);
+					#else
 						system(cmd.c_str());
+					#endif // WIN32
 					} else if (i->second.command != "") {
+					#ifdef WIN32
+						WinExec(i->second.command.c_str(), SW_HIDE);
+					#else
 						system(i->second.command.c_str());
+					#endif // WIN32
 					}
 					target_file = (fs::path(m_setup_path) / i->first).string() + ".bak";
 					if (fs::exists(fs::path(target_file))) {
