@@ -17,6 +17,7 @@
 #include "md5.hpp"
 #include "tinyxml.h"
 #include "updater.hpp"
+#include "avhttp.hpp"
 
 #include <stdio.h>
 #include <string.h>
@@ -25,6 +26,7 @@
 #include <map>
 #include <string>
 #include <vector>
+
 
 #include <boost/asio.hpp>
 using boost::asio::ip::tcp;
@@ -53,14 +55,14 @@ public:
 
 	typedef struct
 	{
-		std::string name;             // ÎÄ¼şÃû.
-		std::string md5;              // ÎÄ¼şµÄMD5Öµ.
-		std::string filehash;         // Ñ¹ËõÎÄ¼şµÄHASH.
-		std::string url;              // ÏÂÔØµÄurl, Ä¬ÈÏÎª¿Õ.
-		std::string command;          // ÃüÁî.
-		std::string compress;         // Ñ¹ËõÑ¡Ïî.
-		bool check;							// ÎÄ¼ş¼ì²éÑ¡Ïî, Èç¹ûÎªture, Ôò±íÊ¾²»±È½ÏMD5, Ö»µ±ÎÄ¼ş²»´æÔÚÊ±²Å¸üĞÂ.
-		boost::uint32_t size;         // ´óĞ¡.
+		std::string name;             // æ–‡ä»¶å.
+		std::string md5;              // æ–‡ä»¶çš„MD5å€¼.
+		std::string filehash;         // å‹ç¼©æ–‡ä»¶çš„HASH.
+		std::string url;              // ä¸‹è½½çš„url, é»˜è®¤ä¸ºç©º.
+		std::string command;          // å‘½ä»¤.
+		std::string compress;         // å‹ç¼©é€‰é¡¹.
+		bool check;							// æ–‡ä»¶æ£€æŸ¥é€‰é¡¹, å¦‚æœä¸ºture, åˆ™è¡¨ç¤ºä¸æ¯”è¾ƒMD5, åªå½“æ–‡ä»¶ä¸å­˜åœ¨æ—¶æ‰æ›´æ–°.
+		boost::uint32_t size;         // å¤§å°.
 	} xml_node_info;
 
 public:
@@ -70,18 +72,21 @@ public:
 public:
 	bool start(const std::string& url, fun_check_files_callback fc, fun_down_load_callback dl,
 		fun_check_files_callback cf, fun_update_files_process uf, std::string setup_path);
+	bool check_update(const std::string& url, const std::string& setup_path);
 	void stop();
 	void pause();
 	void resume();
 	updater::result_type result();
 
 protected:
-	// ¸üĞÂ.
+	// æ›´æ–°.
 	void update_files();
 	bool parser_xml_file(const std::string& file);
 
-	// ÎÄ¼şÏÂÔØ.
+	// æ–‡ä»¶ä¸‹è½½.
 	bool file_down_load(const std::string& u, const std::string& file,
+		xml_node_info& info, const std::string& extera_header = "");
+	bool file_down_load_by_avhttp(const std::string& u, const std::string& file,
 		xml_node_info& info, const std::string& extera_header = "");
 	void down_load_callback(std::string file, int count, int index, 
 		int total_size, int total_read_bytes, int file_size, int read_bytes);
