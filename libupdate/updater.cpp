@@ -118,7 +118,7 @@ bool updater_impl::check_update(const std::string& l, const std::string& s)
 	}
 
 	// 如果更新列表为空, 则表示不需要更新.
-	if (m_update_file_list.size() == 0)
+	if (m_need_update_list.size() == 0)
 		return false;
 
 	return true;
