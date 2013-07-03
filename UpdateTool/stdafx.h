@@ -137,4 +137,5 @@ typedef std::vector<XMLNODEINFO> ListXml;
 #define INI_APP_NAME   _T("Initialize")
 #define INI_OUT_PATH   _T("OutPath")
 #define INI_URL_PATH   _T("Url")
+#define INI_XML_NAME   _T("Xml")
 #define INI_ERROR_RET  _T("0")
