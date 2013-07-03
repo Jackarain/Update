@@ -21,6 +21,8 @@
 #define IDC_EDIT_URL                    1010
 #define IDC_BUTTON1                     1011
 #define IDC_BTN_CLEAN                   1011
+#define IDC_EDIT_URL2                   1012
+#define IDC_EDIT_XML                    1012
 
 // Next default values for new objects
 // 
