@@ -264,8 +264,10 @@ LRESULT CMainDlg::OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam
 	AddAnchor(GetDlgItem(ID_APP_ABOUT), BOTTOM_RIGHT);
 	AddAnchor(GetDlgItem(IDC_IN_PATH), TOP_LEFT, TOP_RIGHT);
 	AddAnchor(GetDlgItem(IDC_OUT_PATH), TOP_LEFT, TOP_RIGHT);
+	AddAnchor(GetDlgItem(IDC_TEXT_URL), TOP_LEFT);
 	AddAnchor(GetDlgItem(IDC_EDIT_URL), TOP_LEFT, TOP_RIGHT);
-	AddAnchor(GetDlgItem(IDC_EDIT_XML), TOP_LEFT, TOP_RIGHT);
+	AddAnchor(GetDlgItem(IDC_TEXT_XML), TOP_RIGHT);
+	AddAnchor(GetDlgItem(IDC_EDIT_XML), TOP_RIGHT);
 
 	// 设置窗口可以接收文件.
 	// DragAcceptFiles(TRUE);
