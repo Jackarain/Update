@@ -12,7 +12,7 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// 非特定语言(默认值) resources
+// Neutral (Default) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NEUD)
 LANGUAGE LANG_NEUTRAL, SUBLANG_DEFAULT
@@ -49,9 +49,11 @@ BEGIN
     PUSHBUTTON      "开始生成",IDC_BTN_GEN,405,17,50,14
     CONTROL         "",IDC_LIST_HASH,"SysListView32",LVS_REPORT | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,7,91,393,234
     LTEXT           "请选择需要加入XML的文件:",IDC_TEXT_LIST_TIP,7,82,393,8
-    EDITTEXT        IDC_EDIT_URL,62,64,338,12,ES_AUTOHSCROLL
-    LTEXT           "URL位置:",IDC_STATIC,7,66,42,8
+    EDITTEXT        IDC_EDIT_URL,62,64,130,12,ES_AUTOHSCROLL
+    LTEXT           "URL位置:",IDC_TEXT_URL,7,66,42,8
     PUSHBUTTON      "清除列表",IDC_BTN_CLEAN,405,36,50,14
+    EDITTEXT        IDC_EDIT_XML,270,63,130,12,ES_AUTOHSCROLL
+    LTEXT           "XML文件名:",IDC_TEXT_XML,215,65,42,8
 END
 
 
@@ -82,12 +84,12 @@ BEGIN
 END
 #endif    // APSTUDIO_INVOKED
 
-#endif    // 非特定语言(默认值) resources
+#endif    // Neutral (Default) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
 /////////////////////////////////////////////////////////////////////////////
-// 中文(简体，中国) resources
+// Chinese (Simplified, PRC) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
 LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
@@ -125,7 +127,7 @@ END
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 IDR_MAINFRAME           ICON                    "res\\UpdateTools.ico"
-#endif    // 中文(简体，中国) resources
+#endif    // Chinese (Simplified, PRC) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

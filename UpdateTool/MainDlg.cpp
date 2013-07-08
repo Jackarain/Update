@@ -231,6 +231,7 @@ LRESULT CMainDlg::OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam
 	m_ctlList.InitListCtrlEx();
 	// m_ctlList.Attach(GetDlgItem(IDC_LIST_HASH));
 	m_ctlBaseUrl.Attach(GetDlgItem(IDC_EDIT_URL));
+	m_ctlXmlName.Attach(GetDlgItem(IDC_EDIT_XML));
 
 	// 设置列表控件属性.
 	m_ctlList.SetExtendedListViewStyle(m_ctlList.GetExtendedListViewStyle() | LVS_EX_GRIDLINES | LVS_EX_FULLROWSELECT | LVS_EX_CHECKBOXES
@@ -263,7 +264,10 @@ LRESULT CMainDlg::OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam
 	AddAnchor(GetDlgItem(ID_APP_ABOUT), BOTTOM_RIGHT);
 	AddAnchor(GetDlgItem(IDC_IN_PATH), TOP_LEFT, TOP_RIGHT);
 	AddAnchor(GetDlgItem(IDC_OUT_PATH), TOP_LEFT, TOP_RIGHT);
+	AddAnchor(GetDlgItem(IDC_TEXT_URL), TOP_LEFT);
 	AddAnchor(GetDlgItem(IDC_EDIT_URL), TOP_LEFT, TOP_RIGHT);
+	AddAnchor(GetDlgItem(IDC_TEXT_XML), TOP_RIGHT);
+	AddAnchor(GetDlgItem(IDC_EDIT_XML), TOP_RIGHT);
 
 	// 设置窗口可以接收文件.
 	// DragAcceptFiles(TRUE);
@@ -271,9 +275,11 @@ LRESULT CMainDlg::OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam
 
 	CString strOutPath;
 	CString strInUrl;
+	CString strInXml;
 
 	strOutPath.Preallocate(MAX_PATH);
 	strInUrl.Preallocate(2048);
+	strInXml.Preallocate(2048);
 
 	// 读取配置文件.
 	GetPrivateProfileString(INI_APP_NAME, INI_OUT_PATH, INI_ERROR_RET, strOutPath.GetBuffer(0), MAX_PATH, INI_FILE_NAME);
@@ -289,6 +295,13 @@ LRESULT CMainDlg::OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam
 	{
 		m_ctlBaseUrl.SetWindowText(strInUrl);
 		m_strBaseUrl = strInUrl;
+	}
+	GetPrivateProfileString(INI_APP_NAME, INI_XML_NAME, INI_ERROR_RET, strInXml.GetBuffer(0), 2048, INI_FILE_NAME);
+	strInXml.ReleaseBuffer();
+	if (strInXml != INI_ERROR_RET)
+	{
+		m_ctlXmlName.SetWindowText(strInXml.IsEmpty() ? "filelist.xm" : strInXml);
+		m_strXmlName = strInXml;
 	}
 
 	return TRUE;
@@ -548,11 +561,13 @@ LRESULT CMainDlg::OnCancel(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOO
 
 void CMainDlg::CloseDialog(int nVal)
 {
-	// 读取配置文件.
+	// 保存配置文件.
 	m_ctlOutPath.GetWindowText(m_strOutPath);
 	WritePrivateProfileString(INI_APP_NAME, INI_OUT_PATH, m_strOutPath.GetBuffer(0), INI_FILE_NAME);
 	m_ctlBaseUrl.GetWindowText(m_strBaseUrl);
 	WritePrivateProfileString(INI_APP_NAME, INI_URL_PATH, m_strBaseUrl.GetBuffer(0), INI_FILE_NAME);
+	m_ctlXmlName.GetWindowText(m_strXmlName);
+	WritePrivateProfileString(INI_APP_NAME, INI_XML_NAME, m_strXmlName.GetBuffer(0), INI_FILE_NAME);
 
 	DestroyWindow();
 	::PostQuitMessage(nVal);
@@ -712,6 +727,12 @@ LRESULT CMainDlg::OnEnChangeEditUrl(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*h
 	return 0;
 }
 
+LRESULT CMainDlg::OnEnChangeEditXml(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
+{
+	m_ctlXmlName.GetWindowText(m_strXmlName);
+
+	return 0;
+}
 
 LRESULT CMainDlg::OnBnClickedBtnClean(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
 {
@@ -957,9 +978,9 @@ void CMainDlg::GenXmlFile()
 
    CString strXmlFile;
    if (m_strOutPath.Right(1) == _T('\\'))
-      strXmlFile = m_strOutPath + _T("filelist.xml");
+      strXmlFile = m_strOutPath + m_strXmlName;
    else
-      strXmlFile = m_strOutPath + _T("\\filelist.xml");
+      strXmlFile = m_strOutPath + _T("\\") + m_strXmlName;
 
    // 保存到XML文件.
    xmlDocument->SaveFile(CW2A(strXmlFile.GetBuffer(0), CP_ACP));

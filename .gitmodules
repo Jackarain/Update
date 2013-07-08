@@ -1,0 +1,3 @@
+[submodule "common/avhttp"]
+	path = common/avhttp
+	url = git@github.com:avplayer/avhttp.git

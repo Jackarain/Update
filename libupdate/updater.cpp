@@ -66,6 +66,64 @@ void updater_impl::resume()
 	m_paused = false;
 }
 
+bool updater_impl::check_update(const std::string& l, const std::string& s)
+{
+	try
+	{
+		std::string file_name;
+		std::string target_file;
+		char md5_buf[33] = { 0 };
+		url u = l;
+
+		// å¾—åˆ°ä¸´æ—¶æ–‡ä»¶å¤¹è·¯å¾„.
+		fs::path p = fs::temp_directory_path();
+		file_name = p.string() + u.filename();
+		std::string extera_header = make_http_last_modified(file_name);
+		xml_node_info info;
+		// ä¸‹è½½xmlæ–‡ä»¶åˆ°ä¸´æ—¶æ–‡ä»¶å¤¹.
+		m_current_index = 0;
+		if (file_down_load(l, file_name, info, extera_header)) {
+			// è§£æxmlæ–‡ä»¶.
+			if (!parser_xml_file(file_name)) {
+				std::cout << "parser xml file failed!\n";
+				m_result = updater::st_error;
+				return false;
+			}
+			// æ£€æŸ¥xmlå’Œå®‰è£…ç›®å½•ä¸‹çš„æ–‡ä»¶, å¾—åˆ°éœ€è¦æ›´æ–°çš„æ–‡ä»¶åˆ—è¡¨.
+			for (std::map<std::string, xml_node_info>::iterator i = m_update_file_list.begin();
+				i != m_update_file_list.end(); i++) {
+					// åªåšæ£€æŸ¥æ—¶ä¸å›è°ƒ.
+					// if (m_setup_file_check)
+					// 	m_setup_file_check(i->first, m_update_file_list.size(), m_current_index++);
+					fs::path p = fs::path(s) / i->second.name;
+					if (!fs::exists(p)) {
+						m_need_update_list.insert(std::make_pair(i->first, i->second));
+						m_upfile_total_size += i->second.size;
+						continue;
+					}
+					std::string md5;
+					memset(md5_buf, 0, 33);
+					MDFile((char*)p.string().c_str(), md5_buf);
+					md5 = md5_buf;
+					boost::to_lower(md5);
+					if (!i->second.check && (md5 != i->second.md5 || i->second.md5.empty())) {
+						m_need_update_list.insert(std::make_pair(i->first, i->second));
+						m_upfile_total_size += i->second.size;
+					}
+			}
+		}
+	}
+	catch (std::exception& e) {
+		std::cout << "exception: " << e.what() << std::endl;
+	}
+
+	// å¦‚æœæ›´æ–°åˆ—è¡¨ä¸ºç©º, åˆ™è¡¨ç¤ºä¸éœ€è¦æ›´æ–°.
+	if (m_need_update_list.size() == 0)
+		return false;
+
+	return true;
+}
+
 void updater_impl::update_files()
 {
 	bool is_need_rollback = false;
@@ -76,21 +134,22 @@ void updater_impl::update_files()
 		char md5_buf[33] = { 0 };
 		url u = m_url;
 
-		// µÃµ½ÁÙÊ±ÎÄ¼ş¼ĞÂ·¾¶.
+		// å¾—åˆ°ä¸´æ—¶æ–‡ä»¶å¤¹è·¯å¾„.
 		fs::path p = fs::temp_directory_path();
 		file_name = p.string() + u.filename();
 		std::string extera_header = make_http_last_modified(file_name);
 		xml_node_info info;
-		// ÏÂÔØxmlÎÄ¼şµ½ÁÙÊ±ÎÄ¼ş¼Ğ.
+		// ä¸‹è½½xmlæ–‡ä»¶åˆ°ä¸´æ—¶æ–‡ä»¶å¤¹.
 		m_current_index = 0;
+		m_upfile_total_size = 0;
 		if (file_down_load(m_url, file_name, info, extera_header)) {
-			// ½âÎöxmlÎÄ¼ş.
+			// è§£æxmlæ–‡ä»¶.
 			if (!parser_xml_file(file_name)) {
 				std::cout << "parser xml file failed!\n";
 				m_result = updater::st_error;
 				return ;
 			}
-			// µÃµ½ĞèÒª¸üĞÂµÄÎÄ¼şÁĞ±í.
+			// å¾—åˆ°éœ€è¦æ›´æ–°çš„æ–‡ä»¶åˆ—è¡¨.
 			for (std::map<std::string, xml_node_info>::iterator i = m_update_file_list.begin();
 				i != m_update_file_list.end(); i++) {
 					if (m_setup_file_check)
@@ -106,7 +165,7 @@ void updater_impl::update_files()
 				MDFile((char*)p.string().c_str(), md5_buf);
 				md5 = md5_buf;
 				boost::to_lower(md5);
-				if (md5 != i->second.md5 || i->second.md5.empty()) {
+				if (!i->second.check && (md5 != i->second.md5 || i->second.md5.empty())) {
 					m_need_update_list.insert(std::make_pair(i->first, i->second));
 					m_upfile_total_size += i->second.size;
 				}
@@ -114,7 +173,7 @@ void updater_impl::update_files()
 			extera_header = "";
 			m_is_downloading = true;
 			m_current_index = 0;
-			// ¸ù¾İxmlÏÂÔØ¸÷ÎÄ¼ş.
+			// æ ¹æ®xmlä¸‹è½½å„æ–‡ä»¶.
 			for (std::map<std::string, xml_node_info>::iterator i = m_need_update_list.begin();
 				i != m_need_update_list.end(); i++) {
 					if (m_abort)
@@ -127,7 +186,7 @@ void updater_impl::update_files()
 					fs::path temp_path = p.string() + fs::path(i->first).parent_path().string();
 					temp_path = temp_path / u.filename();
 					file_name = temp_path.string();
-					// ´Ë´¦ÑéÖ¤Ñ¹ËõÎÄ¼şµÄmd5Öµ, ¸ù¾İmd5½øĞĞÅĞ¶ÏÊÇ·ñÏÂÔØ.
+					// æ­¤å¤„éªŒè¯å‹ç¼©æ–‡ä»¶çš„md5å€¼, æ ¹æ®md5è¿›è¡Œåˆ¤æ–­æ˜¯å¦ä¸‹è½½.
 					std::string md5;
 					if (fs::exists(file_name)) {
 						char md5_buf[33] = { 0 };
@@ -135,7 +194,7 @@ void updater_impl::update_files()
 						md5 = md5_buf;
 						boost::to_lower(md5);
 					}
-					// ±È½Ïmd5.
+					// æ¯”è¾ƒmd5.
 					if (md5 != i->second.filehash || i->second.filehash == "") {
 						if (!file_down_load(i->second.url, file_name, i->second, extera_header)) {
 							std::cout << "download file \'" << file_name.c_str() << "\'failed!\n";
@@ -148,7 +207,7 @@ void updater_impl::update_files()
 			}
 			m_is_downloading = false;
 			m_current_index = 0;
-			// ½âÑ¹²¢¼ì²éÏÂÔØÎÄ¼şµÄmd5Öµ.
+			// è§£å‹å¹¶æ£€æŸ¥ä¸‹è½½æ–‡ä»¶çš„md5å€¼.
 			for (std::map<std::string, xml_node_info>::iterator i = m_need_update_list.begin();
 				i != m_need_update_list.end(); i++) {
 					if (m_abort)
@@ -161,7 +220,7 @@ void updater_impl::update_files()
 					fs::path temp_path = p.string() + fs::path(i->first).parent_path().string();
 					temp_path = temp_path / u.filename();
 					file_name = temp_path.string();
-					// ½âÑ¹Ëõ, Ö§³ÖgzºÍzipÁ½ÖÖÑ¹Ëõ·½°¸.
+					// è§£å‹ç¼©, æ”¯æŒgzå’Œzipä¸¤ç§å‹ç¼©æ–¹æ¡ˆ.
 					if (!i->second.compress.empty()) {
 						if (i->second.compress == "gz") {
 							if (do_extract_gz(file_name.c_str()) != 0) {
@@ -178,14 +237,14 @@ void updater_impl::update_files()
 							}
 						}
 					}
-					// ¼ÆËãmd5.
+					// è®¡ç®—md5.
 					temp_path = p / i->first;
 					file_name = temp_path.string();
 					char md5_buf[33] = { 0 };
 					MDFile((char*)file_name.c_str(), md5_buf);
 					std::string md5 = md5_buf;
 					boost::to_lower(md5);
-					// ±È½Ïmd5.
+					// æ¯”è¾ƒmd5.
 					if (md5 != i->second.md5) {
 						std::cout << "download file md5 check failed, xml md5:\'" << i->second.md5.c_str()
 							<< "\' current file md5:\'" << md5.c_str() << "\'\n";
@@ -194,7 +253,7 @@ void updater_impl::update_files()
 					if (m_fun_check_files)
 						m_fun_check_files(i->first, m_need_update_list.size(), m_current_index++);
 			}
-			// ¸´ÖÆ°²×°.
+			// å¤åˆ¶å®‰è£….
 			m_current_index = 0;
 			is_need_rollback = true;
 			for (std::map<std::string, xml_node_info>::iterator i = m_need_update_list.begin();
@@ -232,7 +291,7 @@ void updater_impl::update_files()
 					if (m_update_files_fun)
 						m_update_files_fun(i->first, m_need_update_list.size(), m_current_index++);
 			}
-			// ÇåÀíbakÎÄ¼ş.
+			// æ¸…ç†bakæ–‡ä»¶.
 			is_need_rollback = false;
 			for (std::map<std::string, xml_node_info>::iterator i = m_update_file_list.begin();
 				i != m_update_file_list.end(); i++) {
@@ -242,7 +301,7 @@ void updater_impl::update_files()
 						while (m_paused) 
 							boost::this_thread::sleep(boost::posix_time::millisec(100));
 					}
-					// Ö´ĞĞÃüÁî.
+					// æ‰§è¡Œå‘½ä»¤.
 					if (i->second.command == "regsvr") {
 						std::string cmd = "regsvr32.exe /s " + (fs::path(m_setup_path) / i->first).string();
 					#ifdef WIN32
@@ -260,10 +319,10 @@ void updater_impl::update_files()
 					target_file = (fs::path(m_setup_path) / i->first).string() + ".bak";
 					if (fs::exists(fs::path(target_file))) {
 						boost::system::error_code ec;
-						remove(fs::path(target_file), ec); // ºöÂÔ´íÎó.
+						remove(fs::path(target_file), ec); // å¿½ç•¥é”™è¯¯.
 					}
 			}
-			// ĞŞ¸Ä¸üĞÂ½á¹û×´Ì¬.
+			// ä¿®æ”¹æ›´æ–°ç»“æœçŠ¶æ€.
 			if (m_need_update_list.size() == 0)
 				m_result = updater::st_no_need_update;
 			else
@@ -278,7 +337,7 @@ void updater_impl::update_files()
 		std::cout << "exception: " << e.what() << std::endl;
 		m_result = updater::st_error;
 		if (is_need_rollback) {
-			// »Ø¹ö²Ù×÷.
+			// å›æ»šæ“ä½œ.
 			for (std::map<std::string, xml_node_info>::iterator i = m_update_file_list.begin();
 				i != m_update_file_list.end(); i++) {
 					std::string target_file = (fs::path(m_setup_path) / i->first).string();
@@ -299,7 +358,7 @@ bool updater_impl::file_down_load(const std::string& u, const std::string& file,
 	try {
 		std::fstream fs;
 
-		// ´´½¨Ä¿Â¼.
+		// åˆ›å»ºç›®å½•.
 		fs::path p = fs::path(file).parent_path();
 		if (!fs::exists(p)) {
 			if (!create_directories(p))
@@ -324,7 +383,7 @@ bool updater_impl::file_down_load(const std::string& u, const std::string& file,
 			socket.connect(*endpoint_iterator++, error);
 		}
 
-		// Á¬½ÓÊ§°Ü.
+		// è¿æ¥å¤±è´¥.
 		if (error) {
 			m_result = updater::st_unable_to_connect;
 			return false;
@@ -407,7 +466,7 @@ bool updater_impl::file_down_load(const std::string& u, const std::string& file,
 
 		remainder = content_length;
 
-		// ´´½¨ÎÄ¼ş.
+		// åˆ›å»ºæ–‡ä»¶.
 		fs.open(file.c_str(), std::ios::trunc | std::ios::in | std::ios::out | std::ios::binary);
 		if (fs.bad() || fs.fail()) {
 			m_result = updater::st_open_file_failed;
@@ -458,7 +517,7 @@ bool updater_impl::file_down_load(const std::string& u, const std::string& file,
 		}
 
 		if (error != boost::asio::error::eof)
-			throw boost::system::system_error(error);
+			return false;
 
 		fs.close();
 		goto SUCCESS_FLAG;
@@ -476,6 +535,12 @@ SUCCESS_FLAG:
 	}
 
 	return true;
+}
+
+bool updater_impl::file_down_load_by_avhttp(const std::string& u,
+	const std::string& file, xml_node_info& info, const std::string& extera_header /*= ""*/)
+{
+	return false;
 }
 
 void updater_impl::down_load_callback(std::string file, int count, int index, 
@@ -600,6 +665,11 @@ void updater::resume()
 updater::result_type updater::result()
 {
 	return m_updater->result();
+}
+
+bool updater::check_update(const std::string& url, const std::string& setup_path)
+{
+	return m_updater->check_update(url, setup_path);
 }
 
 

@@ -253,7 +253,9 @@ public:
 	CString m_strOutPath;
 	DWORD m_dwSumFile;
 	CEdit m_ctlBaseUrl;
+	CEdit m_ctlXmlName;
 	CString m_strBaseUrl;
+	CString m_strXmlName;
 	BOOL m_bDropFiles;
 
 	CCheckFile m_thCheck;		// 检查文件并更新组件.
@@ -292,6 +294,7 @@ public:
 		COMMAND_ID_HANDLER(IDCANCEL, OnCancel)
 		COMMAND_HANDLER(IDC_BTN_GEN, BN_CLICKED, OnBnClickedBtnGen)
 		COMMAND_HANDLER(IDC_EDIT_URL, EN_CHANGE, OnEnChangeEditUrl)
+		COMMAND_HANDLER(IDC_EDIT_XML, EN_CHANGE, OnEnChangeEditXml)
 		COMMAND_HANDLER(IDC_BTN_CLEAN, BN_CLICKED, OnBnClickedBtnClean)
 	END_MSG_MAP()
 
@@ -315,5 +318,6 @@ public:
 	LRESULT OnNMDblclkListHash(int /*idCtrl*/, LPNMHDR pNMHDR, BOOL& /*bHandled*/);
 	LRESULT OnLvnKeydownListHash(int /*idCtrl*/, LPNMHDR pNMHDR, BOOL& /*bHandled*/);
 	LRESULT OnEnChangeEditUrl(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
+	LRESULT OnEnChangeEditXml(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnBnClickedBtnClean(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 };
