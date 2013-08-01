@@ -17,7 +17,6 @@
 #include "md5.hpp"
 #include "tinyxml.h"
 #include "updater.hpp"
-#include "avhttp.hpp"
 
 #include <stdio.h>
 #include <string.h>

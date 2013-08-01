@@ -3,6 +3,7 @@
 #ifdef WIN32
 #include <windows.h>
 #endif // WIN32
+#include "../avhttp/include/avhttp.hpp"
 
 updater_impl::updater_impl(void)
 {
@@ -366,103 +367,29 @@ bool updater_impl::file_down_load(const std::string& u, const std::string& file,
 		}
 
 		boost::asio::io_service &io_service = m_io_service;
-		tcp::resolver resolver(io_service);
-		char buffer[4096] = { 0 };
-		sprintf(buffer, "%d", url.port());
-		tcp::resolver::query query(url.host().c_str(), buffer);
-		tcp::resolver::iterator endpoint_iterator = resolver.resolve(query);
-		tcp::resolver::iterator end;
-
-		boost::shared_ptr<tcp::socket> sock_ptr(new tcp::socket(io_service));
-		m_sock = sock_ptr;
-		tcp::socket &socket = *sock_ptr.get();
-
-		boost::system::error_code error = boost::asio::error::host_not_found;
-		while (error && endpoint_iterator != end) {
-			socket.close();
-			socket.connect(*endpoint_iterator++, error);
-		}
-
-		// 连接失败.
-		if (error) {
-			m_result = updater::st_unable_to_connect;
-			return false;
-		}
-
-		boost::asio::streambuf request;
-		std::ostream request_stream(&request);
-
-		request_stream << "GET " << u << " HTTP/1.0\r\n";
-		request_stream << "Host: " << url.host() << "\r\n";
-		request_stream << "Accept: */*\r\n";
-		if (!extera_header.empty())
-			request_stream << extera_header.c_str();
-		request_stream << "Connection: close\r\n\r\n";
-
-		boost::asio::write(socket, request);
-
+		avhttp::http_stream stream(io_service);
+		avhttp::request_opts options;
+		options.insert(avhttp::http_options::connection, "close");
+		stream.request_options(options);
+		stream.max_redirects(10);
+		stream.open(u);
 		boost::asio::streambuf response;
-		boost::asio::read_until(socket, response, "\r\n");
-		std::istream response_stream(&response);
-		std::string http_version;
-		response_stream >> http_version;
-		unsigned int status_code;
-		response_stream >> status_code;
-		std::string status_message;
-		std::getline(response_stream, status_message);
-
-		if (!response_stream || http_version.substr(0, 5) != "HTTP/") {
-			std::cout << "Invalid response\n";
-			m_result = updater::st_invalid_http_response;
-			return false;
-		}
-		std::cout << "Response returned with status code " << status_code << "\n";
-		if (status_code != 200) {
-			if (status_code == 304) {
-				if (m_is_downloading) {
-					std::map<std::string, xml_node_info>::iterator finder = 
-						m_need_update_list.find(info.name);
-					if (finder != m_need_update_list.end()) {
-						m_total_read_bytes += finder->second.size;
-						down_load_callback(url.filename(), m_need_update_list.size(), m_current_index, 
-							m_upfile_total_size, m_total_read_bytes, finder->second.size, finder->second.size);
-					}
-				}
-				goto SUCCESS_FLAG;
-			}
-			m_result = updater::st_invalid_http_response;
-			return false;
-		}
-
-		// Read the response headers, which are terminated by a blank line.
-		boost::asio::read_until(socket, response, "\r\n\r\n");
+		
 
 		// Process the response headers.
 		int recvive_bytes = 0;
 		int content_length = 0;
 		int remainder = 0;
 		std::string header;
+		struct tm date = { 0 };
+
+		content_length = stream.content_length();
+		header = stream.response_options().find("Last-Modified");
 		std::string modified_time;
-
-		while (std::getline(response_stream, header) && header != "\r") {
-			boost::regex ex;
-			boost::smatch what;
-			std::string::const_iterator start, end;
-
-			start = header.begin();
-			end = header.end();
-
-			// match Content-Length
-			ex.assign("Content-Length.*?\\:.*?(\\d+)");
-			if (boost::regex_search(start, end, what, ex, boost::match_default))
-				content_length = atoi(std::string(what[1]).c_str());
-			ex.assign("Last-Modified.*?\\:\\s?(\\w+),\\s?(\\d+)\\s?(\\w+)\\s?(\\d+)\\s?(\\d+)\\:(\\d+)\\:(\\d+)");
-			if (boost::regex_search(start, end, what, ex, boost::match_default)) {
-				struct tm date = { 0 };
-				if (parser_http_last_modified(header, &date))
-					last_modified_time = mktime(&date);
-			}
+		if (parser_http_last_modified(header, &date)) {
+			last_modified_time = mktime(&date);
 		}
+
 
 		remainder = content_length;
 
@@ -473,27 +400,11 @@ bool updater_impl::file_down_load(const std::string& u, const std::string& file,
 			return false;
 		}
 
-		// Write whatever content we already have to output.
-		while (response.size() > 0) {
-			recvive_bytes = response.size() > 4096 ? 4096 : response.size();
-			response.sgetn(buffer, recvive_bytes);
-			fs.write(buffer, recvive_bytes);
-			remainder -= recvive_bytes;
-		}
-
-		// Call callback function.
-		if (m_is_downloading) {
-			int read_bytes = content_length - remainder;
-			m_total_read_bytes += read_bytes;
-			down_load_callback(url.filename(), m_update_file_list.size(), m_current_index, 
-				m_upfile_total_size, m_total_read_bytes, content_length, read_bytes);
-		}
-
-		if (remainder <= 0)
-			goto SUCCESS_FLAG;
-
+		char buffer[4096];
+		
+		boost::system::error_code error;
 		// Read until EOF, writing data to output as we go.
-		while (boost::asio::read(socket, response,
+		while (boost::asio::read(stream, response,
 			boost::asio::transfer_at_least(1), error))
 		{
 			while (response.size() > 0) {
