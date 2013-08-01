@@ -25,6 +25,7 @@
 #define IDC_URL                         1013
 #define IDC_TEXT_URL                    1013
 #define IDC_TEXT_XML                    1014
+#define IDC_BTN_REFRESH                 1015
 
 // Next default values for new objects
 // 
