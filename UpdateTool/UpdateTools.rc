@@ -12,7 +12,7 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// Neutral (Default) resources
+// 非特定语言(默认值) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NEUD)
 LANGUAGE LANG_NEUTRAL, SUBLANG_DEFAULT
@@ -54,6 +54,7 @@ BEGIN
     PUSHBUTTON      "清除列表",IDC_BTN_CLEAN,405,36,50,14
     EDITTEXT        IDC_EDIT_XML,270,63,130,12,ES_AUTOHSCROLL
     LTEXT           "XML文件名:",IDC_TEXT_XML,215,65,42,8
+    PUSHBUTTON      "刷新列表",IDC_BTN_REFRESH,406,55,50,14
 END
 
 
@@ -84,12 +85,12 @@ BEGIN
 END
 #endif    // APSTUDIO_INVOKED
 
-#endif    // Neutral (Default) resources
+#endif    // 非特定语言(默认值) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
 /////////////////////////////////////////////////////////////////////////////
-// Chinese (Simplified, PRC) resources
+// 中文(简体，中国) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
 LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
@@ -127,7 +128,7 @@ END
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 IDR_MAINFRAME           ICON                    "res\\UpdateTools.ico"
-#endif    // Chinese (Simplified, PRC) resources
+#endif    // 中文(简体，中国) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

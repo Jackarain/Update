@@ -296,6 +296,7 @@ public:
 		COMMAND_HANDLER(IDC_EDIT_URL, EN_CHANGE, OnEnChangeEditUrl)
 		COMMAND_HANDLER(IDC_EDIT_XML, EN_CHANGE, OnEnChangeEditXml)
 		COMMAND_HANDLER(IDC_BTN_CLEAN, BN_CLICKED, OnBnClickedBtnClean)
+		COMMAND_HANDLER(IDC_BTN_REFRESH, BN_CLICKED, OnBnClickedBtnRefresh)
 	END_MSG_MAP()
 
 	void CloseDialog(int nVal);
@@ -320,4 +321,5 @@ public:
 	LRESULT OnEnChangeEditUrl(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnEnChangeEditXml(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnBnClickedBtnClean(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
+	LRESULT OnBnClickedBtnRefresh(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 };

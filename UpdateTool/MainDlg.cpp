@@ -260,6 +260,7 @@ LRESULT CMainDlg::OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam
 	AddAnchor(GetDlgItem(IDC_CHECK), TOP_RIGHT);
 	AddAnchor(GetDlgItem(IDC_BTN_GEN), TOP_RIGHT);
 	AddAnchor(GetDlgItem(IDC_BTN_CLEAN), TOP_RIGHT);
+	AddAnchor(GetDlgItem(IDC_BTN_REFRESH), TOP_RIGHT);
 	AddAnchor(GetDlgItem(IDCANCEL), BOTTOM_RIGHT);
 	AddAnchor(GetDlgItem(ID_APP_ABOUT), BOTTOM_RIGHT);
 	AddAnchor(GetDlgItem(IDC_IN_PATH), TOP_LEFT, TOP_RIGHT);
@@ -992,4 +993,11 @@ void CMainDlg::GenXmlFile()
    PostMessage(WM_COMMPRESS_COMPLETE, (WPARAM)nSum, (LPARAM)m_strOutPath.GetBuffer(0));
    // 清空容器.
    m_lstXmlInfo.clear();
+}
+
+LRESULT CMainDlg::OnBnClickedBtnRefresh( WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled )
+{
+	m_thCheck.SetFindPath(m_strInPath);
+	boost::thread(boost::bind(&CCheckFile::Execute, &m_thCheck, (DWORD_PTR)m_hWnd, (HANDLE)NULL));
+	return 0;
 }
