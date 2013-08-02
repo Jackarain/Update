@@ -40,7 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../common/tinyxml;../common/md5;../common/zlib-1.2.5"
+				AdditionalIncludeDirectories="../common/tinyxml;../common/md5;../common/zlib-1.2.5;../common/avhttp/include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -102,7 +102,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="../common/tinyxml;../common/md5;../common/zlib-1.2.5"
+				AdditionalIncludeDirectories="../common/tinyxml;../common/md5;../common/zlib-1.2.5;../common/avhttp/include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB"
 				RuntimeLibrary="0"
 				WarningLevel="3"
