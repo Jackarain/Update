@@ -557,6 +557,22 @@ std::string updater_impl::make_http_last_modified(const std::string& file)
 	return str;
 }
 
+std::string updater_impl::last_modified(const std::string& file)
+{
+	std::string str;
+	fs::path p(file);
+	if (fs::exists(p))
+	{
+		std::time_t t = fs::last_write_time(p);
+		tm* gmt = gmtime((const time_t*)&t);
+		char time_buf[512] = { 0 };
+		strftime(time_buf, 200, "%a, %d %b %Y %H:%M:%S GMT\r\n", gmt);
+		str = time_buf;
+	}
+
+	return str;
+}
+
 bool updater_impl::parser_http_last_modified(const std::string& str, struct tm* time)
 {
    std::string date;
@@ -575,4 +591,17 @@ bool updater_impl::parser_http_last_modified(const std::string& str, struct tm* 
    *time = *tm;
 
    return true;
+}
+
+bool updater_impl::parser_last_modified(const std::string& str, struct tm* time)
+{
+	time_t t;
+	if (parsedate(str.c_str(), &t) != PARSEDATE_OK)
+		return false;
+	struct tm* tm = localtime(&t);
+	if (!tm)
+		return false;
+	*time = *tm;
+
+	return true;
 }

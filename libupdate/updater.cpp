@@ -3,7 +3,7 @@
 #ifdef WIN32
 #include <windows.h>
 #endif // WIN32
-#include "../avhttp/include/avhttp.hpp"
+#include "avhttp.hpp"
 
 updater_impl::updater_impl(void)
 {
@@ -79,11 +79,11 @@ bool updater_impl::check_update(const std::string& l, const std::string& s)
 		// 得到临时文件夹路径.
 		fs::path p = fs::temp_directory_path();
 		file_name = p.string() + u.filename();
-		std::string extera_header = make_http_last_modified(file_name);
+		std::string extera_header = last_modified(file_name);
 		xml_node_info info;
 		// 下载xml文件到临时文件夹.
 		m_current_index = 0;
-		if (file_down_load(l, file_name, info, extera_header)) {
+		if (file_down_load(l, file_name, extera_header)) {
 			// 解析xml文件.
 			if (!parser_xml_file(file_name)) {
 				std::cout << "parser xml file failed!\n";
@@ -138,12 +138,12 @@ void updater_impl::update_files()
 		// 得到临时文件夹路径.
 		fs::path p = fs::temp_directory_path();
 		file_name = p.string() + u.filename();
-		std::string extera_header = make_http_last_modified(file_name);
+		std::string extera_header = last_modified(file_name);
 		xml_node_info info;
 		// 下载xml文件到临时文件夹.
 		m_current_index = 0;
 		m_upfile_total_size = 0;
-		if (file_down_load(m_url, file_name, info, extera_header)) {
+		if (file_down_load(m_url, file_name, extera_header)) {
 			// 解析xml文件.
 			if (!parser_xml_file(file_name)) {
 				std::cout << "parser xml file failed!\n";
@@ -197,7 +197,7 @@ void updater_impl::update_files()
 					}
 					// 比较md5.
 					if (md5 != i->second.filehash || i->second.filehash == "") {
-						if (!file_down_load(i->second.url, file_name, i->second, extera_header)) {
+						if (!file_down_load(i->second.url, file_name, extera_header)) {
 							std::cout << "download file \'" << file_name.c_str() << "\'failed!\n";
 							return ;
 						}
@@ -350,8 +350,8 @@ void updater_impl::update_files()
 	}
 }
 
-bool updater_impl::file_down_load(const std::string& u, const std::string& file, 
-	xml_node_info& info, const std::string& extera_header/* = ""*/)
+bool updater_impl::file_down_load(const std::string& u,
+	const std::string& file, const std::string& extera_header/* = ""*/)
 {
 	time_t last_modified_time = 0;
 	url url = u;
@@ -366,15 +366,19 @@ bool updater_impl::file_down_load(const std::string& u, const std::string& file,
 				return false;
 		}
 
+		boost::system::error_code error;
 		boost::asio::io_service &io_service = m_io_service;
 		avhttp::http_stream stream(io_service);
 		avhttp::request_opts options;
+
 		options.insert(avhttp::http_options::connection, "close");
+		if (!extera_header.empty())
+			options.insert("If-Modified-Since", extera_header);
 		stream.request_options(options);
 		stream.max_redirects(10);
-		stream.open(u);
+
+		stream.open(u, error);
 		boost::asio::streambuf response;
-		
 
 		// Process the response headers.
 		int recvive_bytes = 0;
@@ -383,13 +387,14 @@ bool updater_impl::file_down_load(const std::string& u, const std::string& file,
 		std::string header;
 		struct tm date = { 0 };
 
+		// 解析http头信息.
 		content_length = stream.content_length();
 		header = stream.response_options().find("Last-Modified");
-		std::string modified_time;
-		if (parser_http_last_modified(header, &date)) {
+
+		// 得到最后修改时间.
+		if (parser_last_modified(header, &date)) {
 			last_modified_time = mktime(&date);
 		}
-
 
 		remainder = content_length;
 
@@ -400,45 +405,37 @@ bool updater_impl::file_down_load(const std::string& u, const std::string& file,
 			return false;
 		}
 
-		char buffer[4096];
-		
-		boost::system::error_code error;
 		// Read until EOF, writing data to output as we go.
 		while (boost::asio::read(stream, response,
 			boost::asio::transfer_at_least(1), error))
 		{
-			while (response.size() > 0) {
-				recvive_bytes = response.size() > 4096 ? 4096 : response.size();
-				response.sgetn(buffer, recvive_bytes);
-				fs.write(buffer, recvive_bytes);
-				remainder -= recvive_bytes;
-				if (m_is_downloading) {
-					int read_bytes = content_length - remainder;
-					m_total_read_bytes += recvive_bytes;
-					down_load_callback(url.filename(), m_update_file_list.size(), m_current_index, 
-						m_upfile_total_size, m_total_read_bytes, content_length, read_bytes);
-				}
-				if (m_abort)
-					return false;
-				if (remainder <= 0) {
-					fs.close();
-					goto SUCCESS_FLAG;
-				}
+			// 计算文件剩余字节数.
+			remainder -= response.size();
+			// 写入文件.
+			fs << &response;
+			// 下载更新文件的时候, 才回调用户回调, 下载如xml不进入回调.
+			if (m_is_downloading) {
+				int read_bytes = content_length - remainder;
+				m_total_read_bytes += recvive_bytes;
+				down_load_callback(url.filename(), m_update_file_list.size(), m_current_index,
+					m_upfile_total_size, m_total_read_bytes, content_length, read_bytes);
 			}
+			if (m_abort)
+				return false;
+			if (remainder <= 0)
+				break;
 		}
 
-		if (error != boost::asio::error::eof)
+		// 未下载完成, 返回失败.
+		if (remainder != 0)
 			return false;
 
-		fs.close();
-		goto SUCCESS_FLAG;
 	} catch (std::exception& e) {
 		std::cout << e.what() << std::endl;
 		return false;
 	}
 
-SUCCESS_FLAG:
-
+	// 修改文件的最后修改时间.
 	if (last_modified_time != 0) {
 		fs::path p(file);
 		if (fs::exists(p))
@@ -446,12 +443,6 @@ SUCCESS_FLAG:
 	}
 
 	return true;
-}
-
-bool updater_impl::file_down_load_by_avhttp(const std::string& u,
-	const std::string& file, xml_node_info& info, const std::string& extera_header /*= ""*/)
-{
-	return false;
 }
 
 void updater_impl::down_load_callback(std::string file, int count, int index, 
