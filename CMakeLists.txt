@@ -13,8 +13,6 @@ add_subdirectory(common/tinyxml)
 ## zlib
 include_directories(common/zlib-1.2.5)
 add_subdirectory(common/zlib-1.2.5)
-#for zconf.h
-include_directories(${zlib_BINARY_DIR})
 
 add_subdirectory(libupdate)
 add_subdirectory(Updater)
