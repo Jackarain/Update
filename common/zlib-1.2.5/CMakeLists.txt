@@ -91,7 +91,13 @@ set(ZLIB_PRIVATE_HDRS
     inffixed.h
     inflate.h
     inftrees.h
+	ioapi.h
+	ioinbuffer.h
+	iowin32.h
+	mztools.h
     trees.h
+	unzip.h
+	zip.h
     zutil.h
 )
 set(ZLIB_SRCS
@@ -107,9 +113,15 @@ set(ZLIB_SRCS
     infback.c
     inftrees.c
     inffast.c
+	ioapi.c
+	ioinbuffer.c
+	iowin32.c
+	mztools.c
     trees.c
     uncompr.c
+	unzip.c
     zutil.c
+	zip.c
     win32/zlib1.rc
 )
 

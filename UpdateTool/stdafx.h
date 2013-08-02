@@ -42,7 +42,6 @@ extern CAppModule _Module;
 #include <atlddx.h>
 #include <atlmisc.h>
 #include <atlgdi.h>
-#include <atlhttp.h>
 
 #include <winver.h>
 #pragma comment(lib, "Version.lib")
@@ -84,9 +83,7 @@ extern CAppModule _Module;
 #include <boost/bind.hpp>
 #include <boost/ref.hpp>
 #include <boost/utility.hpp>
-#include <boost/test/unit_test.hpp>
 #define DEFAULT_EXECUTION_MONITOR_TYPE execution_monitor::use_sleep_only
-#include <libs/thread/test/util.inl>
 
 // #include <Singleton.h>
 // #pragma comment(lib, "loki.lib")

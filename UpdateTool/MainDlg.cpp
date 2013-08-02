@@ -301,7 +301,7 @@ LRESULT CMainDlg::OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam
 	strInXml.ReleaseBuffer();
 	if (strInXml != INI_ERROR_RET)
 	{
-		m_ctlXmlName.SetWindowText(strInXml.IsEmpty() ? "filelist.xm" : strInXml);
+		m_ctlXmlName.SetWindowText(strInXml.IsEmpty() ? "filelist.xml" : strInXml);
 		m_strXmlName = strInXml;
 	}
 
