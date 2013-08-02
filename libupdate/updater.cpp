@@ -390,14 +390,13 @@ bool updater_impl::file_down_load(const std::string& u,
 
 		// 解析http头信息.
 		content_length = stream.content_length();
-		header = stream.response_options().find("Last-Modified");
-
-		// 得到最后修改时间.
-		if (parser_last_modified(header, &date)) {
-			last_modified_time = mktime(&date);
-		}
+		
+		if(stream.response_options().find(avhttp::http_options::status_code) == "304")
+			return true;
 
 		remainder = content_length;
+
+		
 
 		// 创建文件.
 		fs.open(file.c_str(), std::ios::trunc | std::ios::in | std::ios::out | std::ios::binary);
