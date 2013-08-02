@@ -13,6 +13,8 @@
 #ifndef __UPDATER_IMPL_H__
 #define __UPDATER_IMPL_H__
 
+#pragma once
+
 #include "url.hpp"
 #include "md5.hpp"
 #include "tinyxml.h"
@@ -38,9 +40,6 @@ using boost::asio::ip::tcp;
 #include <boost/filesystem.hpp>
 namespace fs = boost::filesystem;
 #include <boost/algorithm/string.hpp>
-
-
-#pragma once
 
 class updater_impl
 {
@@ -83,15 +82,16 @@ protected:
 	bool parser_xml_file(const std::string& file);
 
 	// 文件下载.
-	bool file_down_load(const std::string& u, const std::string& file,
-		xml_node_info& info, const std::string& extera_header = "");
-	bool file_down_load_by_avhttp(const std::string& u, const std::string& file,
-		xml_node_info& info, const std::string& extera_header = "");
+	bool file_down_load(const std::string& u,
+		const std::string& file, const std::string& extera_header = "");
 	void down_load_callback(std::string file, int count, int index, 
 		int total_size, int total_read_bytes, int file_size, int read_bytes);
 
+	// 最后修改时间.
 	std::string make_http_last_modified(const std::string& file);
+	std::string last_modified(const std::string& file);
 	bool parser_http_last_modified(const std::string& str, struct tm* time);
+	bool parser_last_modified(const std::string& str, struct tm* time);
 
 private:
 	fun_check_files_callback m_setup_file_check;
