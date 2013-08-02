@@ -6,6 +6,7 @@
 #include "avhttp.hpp"
 
 updater_impl::updater_impl(void)
+	: m_abort(false)
 {
 	m_result = updater::st_error;
 }
