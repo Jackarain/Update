@@ -198,7 +198,7 @@ void updater_impl::update_files()
 					}
 					// 比较md5.
 					if (md5 != i->second.filehash || i->second.filehash == "") {
-						if (!file_down_load(i->second.url, file_name, extera_header)) {
+						if (!file_down_load(i->second.url, file_name, extera_header, i)) {
 							std::cout << "download file \'" << file_name.c_str() << "\'failed!\n";
 							return ;
 						}
