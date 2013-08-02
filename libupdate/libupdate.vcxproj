@@ -1,0 +1,135 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{5923C496-E031-4B62-9970-55E2A90D292F}</ProjectGuid>
+    <RootNamespace>libupdate</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v110</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v110</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>11.0.51106.1</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>../common/zlib-1.2.5;../common/tinyxml;../common/md5;../common/avhttp/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>../common/tinyxml;../common/md5;../common/zlib-1.2.5;../common/avhttp/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="parser_http_date.cpp" />
+    <ClCompile Include="uncompress.cpp" />
+    <ClCompile Include="updater.cpp" />
+    <ClCompile Include="url.cpp" />
+    <ClCompile Include="..\common\tinyxml\tinystr.cpp" />
+    <ClCompile Include="..\common\tinyxml\tinyxml.cpp" />
+    <ClCompile Include="..\common\tinyxml\tinyxmlerror.cpp" />
+    <ClCompile Include="..\common\tinyxml\tinyxmlparser.cpp" />
+    <ClCompile Include="..\common\zlib-1.2.5\adler32.c" />
+    <ClCompile Include="..\common\zlib-1.2.5\compress.c" />
+    <ClCompile Include="..\common\zlib-1.2.5\crc32.c" />
+    <ClCompile Include="..\common\zlib-1.2.5\deflate.c" />
+    <ClCompile Include="..\common\zlib-1.2.5\example.c" />
+    <ClCompile Include="..\common\zlib-1.2.5\gzclose.c" />
+    <ClCompile Include="..\common\zlib-1.2.5\gzlib.c" />
+    <ClCompile Include="..\common\zlib-1.2.5\gzread.c" />
+    <ClCompile Include="..\common\zlib-1.2.5\gzwrite.c" />
+    <ClCompile Include="..\common\zlib-1.2.5\infback.c" />
+    <ClCompile Include="..\common\zlib-1.2.5\inffast.c" />
+    <ClCompile Include="..\common\zlib-1.2.5\inflate.c" />
+    <ClCompile Include="..\common\zlib-1.2.5\inftrees.c" />
+    <ClCompile Include="..\common\zlib-1.2.5\ioapi.c" />
+    <ClCompile Include="..\common\zlib-1.2.5\ioinbuffer.c" />
+    <ClCompile Include="..\common\zlib-1.2.5\iowin32.c" />
+    <ClCompile Include="..\common\zlib-1.2.5\mztools.c" />
+    <ClCompile Include="..\common\zlib-1.2.5\trees.c" />
+    <ClCompile Include="..\common\zlib-1.2.5\uncompr.c" />
+    <ClCompile Include="..\common\zlib-1.2.5\unzip.c" />
+    <ClCompile Include="..\common\zlib-1.2.5\zip.c" />
+    <ClCompile Include="..\common\zlib-1.2.5\zutil.c" />
+    <ClCompile Include="..\common\md5\md5.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="uncompress.hpp" />
+    <ClInclude Include="updater.hpp" />
+    <ClInclude Include="updater_impl.hpp" />
+    <ClInclude Include="url.hpp" />
+    <ClInclude Include="..\common\zlib-1.2.5\crc32.h" />
+    <ClInclude Include="..\common\zlib-1.2.5\crypt.h" />
+    <ClInclude Include="..\common\zlib-1.2.5\deflate.h" />
+    <ClInclude Include="..\common\zlib-1.2.5\gzguts.h" />
+    <ClInclude Include="..\common\zlib-1.2.5\inffast.h" />
+    <ClInclude Include="..\common\zlib-1.2.5\inffixed.h" />
+    <ClInclude Include="..\common\zlib-1.2.5\inflate.h" />
+    <ClInclude Include="..\common\zlib-1.2.5\inftrees.h" />
+    <ClInclude Include="..\common\zlib-1.2.5\ioapi.h" />
+    <ClInclude Include="..\common\zlib-1.2.5\ioinbuffer.h" />
+    <ClInclude Include="..\common\zlib-1.2.5\iowin32.h" />
+    <ClInclude Include="..\common\zlib-1.2.5\mztools.h" />
+    <ClInclude Include="..\common\zlib-1.2.5\trees.h" />
+    <ClInclude Include="..\common\zlib-1.2.5\unzip.h" />
+    <ClInclude Include="..\common\zlib-1.2.5\zconf.h" />
+    <ClInclude Include="..\common\zlib-1.2.5\zip.h" />
+    <ClInclude Include="..\common\zlib-1.2.5\zlib.h" />
+    <ClInclude Include="..\common\zlib-1.2.5\zutil.h" />
+    <ClInclude Include="..\common\md5\md5.hpp" />
+    <ClInclude Include="..\common\tinyxml\tinystr.h" />
+    <ClInclude Include="..\common\tinyxml\tinyxml.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
