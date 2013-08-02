@@ -9,5 +9,9 @@ include_directories(${WTL_INCLUDE_DIRS})
 
 include_directories(../libupdate)
 
-add_executable(Updater WIN32 main.cpp MainDlg.cpp stdafx.cpp MainDlg.h resource.h stdafx.h Update.h Update.rc)
+set(UPDATE_SRC main.cpp MainDlg.cpp stdafx.cpp)
+set(UPDATE_HDR MainDlg.h resource.h stdafx.h Update.h)
+set(UPDATE_RSC Update.rc)
+
+add_executable(Updater WIN32 ${UPDATE_SRC} ${UPDATE_HDR} ${UPDATE_RSC})
 target_link_libraries(Updater libupdate zlib tinyxml md5)
