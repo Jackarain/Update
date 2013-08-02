@@ -13,21 +13,21 @@
 #ifndef __UPDATER_H__
 #define __UPDATER_H__
 
-#include <boost/function.hpp>
-class updater_impl;
-
 #pragma once
 
+#include <boost/function.hpp>
+
+class updater_impl;
 
 class updater
 {
 public:
-	typedef boost::function<void (std::string file, 
-		int count, int index)> fun_check_files_callback;
-	typedef boost::function<void (std::string file, 
-		int count, int index)> fun_update_files_process;
-	typedef boost::function<void (std::string file, int count, int index, 
-		int total_size, int total_read_bytes,
+	// 文件检查回调.
+	typedef boost::function<void (std::string file, int count, int index)> fun_check_files_callback;
+	// 更新文件回调.
+	typedef boost::function<void (std::string file, int count, int index)> fun_update_files_process;
+	// 文件下载回调.
+	typedef boost::function<void (std::string file, int count, int index, int total_size, int total_read_bytes,
 		int file_size, int read_bytes)> fun_down_load_callback;
 
 	enum result_type {
