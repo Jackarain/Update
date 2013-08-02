@@ -63,6 +63,8 @@ public:
 		boost::uint32_t size;         // 大小.
 	} xml_node_info;
 
+	typedef std::map<std::string, xml_node_info> info_map;
+
 public:
 	updater_impl(void);
 	virtual ~updater_impl(void);
@@ -82,8 +84,9 @@ protected:
 	bool parser_xml_file(const std::string& file);
 
 	// 文件下载.
-	bool file_down_load(const std::string& u,
-		const std::string& file, const std::string& extera_header = "");
+	bool file_down_load(const std::string& u, const std::string& file,
+		const std::string& extera_header = "",
+		info_map::iterator node = info_map::iterator());
 	void down_load_callback(std::string file, int count, int index, 
 		int total_size, int total_read_bytes, int file_size, int read_bytes);
 
@@ -102,8 +105,8 @@ private:
 	std::string m_url;
 	std::string m_setup_path;
 	boost::thread m_update_thrd;
-	std::map<std::string, xml_node_info> m_update_file_list;
-	std::map<std::string, xml_node_info> m_need_update_list;
+	info_map m_update_file_list;
+	info_map m_need_update_list;
 	boost::uint64_t m_upfile_total_size;
 	int m_current_index;
 	int m_total_read_bytes;

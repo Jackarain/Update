@@ -92,7 +92,7 @@ bool updater_impl::check_update(const std::string& l, const std::string& s)
 				return false;
 			}
 			// 检查xml和安装目录下的文件, 得到需要更新的文件列表.
-			for (std::map<std::string, xml_node_info>::iterator i = m_update_file_list.begin();
+			for (info_map::iterator i = m_update_file_list.begin();
 				i != m_update_file_list.end(); i++) {
 					// 只做检查时不回调.
 					// if (m_setup_file_check)
@@ -152,7 +152,7 @@ void updater_impl::update_files()
 				return ;
 			}
 			// 得到需要更新的文件列表.
-			for (std::map<std::string, xml_node_info>::iterator i = m_update_file_list.begin();
+			for (info_map::iterator i = m_update_file_list.begin();
 				i != m_update_file_list.end(); i++) {
 					if (m_setup_file_check)
 						m_setup_file_check(i->first, m_update_file_list.size(), m_current_index++);
@@ -176,7 +176,7 @@ void updater_impl::update_files()
 			m_is_downloading = true;
 			m_current_index = 0;
 			// 根据xml下载各文件.
-			for (std::map<std::string, xml_node_info>::iterator i = m_need_update_list.begin();
+			for (info_map::iterator i = m_need_update_list.begin();
 				i != m_need_update_list.end(); i++) {
 					if (m_abort)
 						return ;
@@ -210,7 +210,7 @@ void updater_impl::update_files()
 			m_is_downloading = false;
 			m_current_index = 0;
 			// 解压并检查下载文件的md5值.
-			for (std::map<std::string, xml_node_info>::iterator i = m_need_update_list.begin();
+			for (info_map::iterator i = m_need_update_list.begin();
 				i != m_need_update_list.end(); i++) {
 					if (m_abort)
 						return ;
@@ -258,7 +258,7 @@ void updater_impl::update_files()
 			// 复制安装.
 			m_current_index = 0;
 			is_need_rollback = true;
-			for (std::map<std::string, xml_node_info>::iterator i = m_need_update_list.begin();
+			for (info_map::iterator i = m_need_update_list.begin();
 				i != m_need_update_list.end(); i++) {
 					if (m_abort)
 						throw std::exception("user abort!"); // for rollback.
@@ -295,7 +295,7 @@ void updater_impl::update_files()
 			}
 			// 清理bak文件.
 			is_need_rollback = false;
-			for (std::map<std::string, xml_node_info>::iterator i = m_update_file_list.begin();
+			for (info_map::iterator i = m_update_file_list.begin();
 				i != m_update_file_list.end(); i++) {
 					if (m_abort)
 						return ;
@@ -340,7 +340,7 @@ void updater_impl::update_files()
 		m_result = updater::st_error;
 		if (is_need_rollback) {
 			// 回滚操作.
-			for (std::map<std::string, xml_node_info>::iterator i = m_update_file_list.begin();
+			for (info_map::iterator i = m_update_file_list.begin();
 				i != m_update_file_list.end(); i++) {
 					std::string target_file = (fs::path(m_setup_path) / i->first).string();
 					std::string backup_file = fs::path(target_file + ".bak").string();
@@ -352,7 +352,8 @@ void updater_impl::update_files()
 }
 
 bool updater_impl::file_down_load(const std::string& u,
-	const std::string& file, const std::string& extera_header/* = ""*/)
+	const std::string& file, const std::string& extera_header/* = ""*/,
+	info_map::iterator node/* = info_map::iterator()*/)
 {
 	time_t last_modified_time = 0;
 	url url = u;
@@ -388,15 +389,20 @@ bool updater_impl::file_down_load(const std::string& u,
 		std::string header;
 		struct tm date = { 0 };
 
-		// 解析http头信息.
-		content_length = stream.content_length();
-		
+		// 检查http状态是否为304, 未修改表示无需下载, 直接返回true.
 		if(stream.response_options().find(avhttp::http_options::status_code) == "304")
 			return true;
 
+		// 得到content_length.
+		content_length = stream.content_length();
+		// 如果文件大小没有从http服务器获得, 从xml中获取.
+		if (content_length == -1) {
+			if (node != info_map::iterator()) {
+				content_length = node->second.size;
+			}
+		}
+		// 记录需要下载的字节数.
 		remainder = content_length;
-
-		
 
 		// 创建文件.
 		fs.open(file.c_str(), std::ios::trunc | std::ios::in | std::ios::out | std::ios::binary);
@@ -410,11 +416,12 @@ bool updater_impl::file_down_load(const std::string& u,
 			boost::asio::transfer_at_least(1), error))
 		{
 			// 计算文件剩余字节数.
-			remainder -= response.size();
+			if (remainder >= 0)
+				remainder -= response.size();
 			// 写入文件.
 			fs << &response;
 			// 下载更新文件的时候, 才回调用户回调, 下载如xml不进入回调.
-			if (m_is_downloading) {
+			if (m_is_downloading && content_length != -1) {
 				int read_bytes = content_length - remainder;
 				m_total_read_bytes += recvive_bytes;
 				down_load_callback(url.filename(), m_update_file_list.size(), m_current_index,
@@ -426,10 +433,17 @@ bool updater_impl::file_down_load(const std::string& u,
 				break;
 		}
 
-		// 未下载完成, 返回失败.
-		if (remainder != 0)
-			return false;
-
+		if (content_length == -1) {
+			// 在没有长度的情况下, 不是正常关闭连接, 返回fasle.
+			if (error != boost::asio::error::eof) {
+				return false;
+			}
+		}
+		else {
+			// 未下载完成, 返回失败.
+			if (remainder != 0)
+				return false;
+		}
 	} catch (std::exception& e) {
 		std::cout << e.what() << std::endl;
 		return false;
@@ -515,7 +529,7 @@ bool updater_impl::parser_xml_file(const std::string& file)
 		}
 
 #ifdef _DEBUG
-		for (std::map<std::string, xml_node_info>::iterator i = m_update_file_list.begin();
+		for (info_map::iterator i = m_update_file_list.begin();
 			i != m_update_file_list.end(); i++) {
 				std::cout << i->first.c_str() << "\n";
 		}
