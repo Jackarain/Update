@@ -14,6 +14,9 @@ add_subdirectory(common/tinyxml)
 include_directories(common/zlib-1.2.5)
 add_subdirectory(common/zlib-1.2.5)
 
+## avhttp
+include_directories(common/avhttp/include)
+
 add_subdirectory(libupdate)
 add_subdirectory(Updater)
 add_subdirectory(UpdateTool)
