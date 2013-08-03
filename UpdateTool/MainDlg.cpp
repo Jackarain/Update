@@ -131,54 +131,49 @@ LRESULT CListEx::OnKeyDown(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandl
 	return 0;
 }
 
-void CMainDlg::AddFiles(ListXml& t, path const& p, path const& l, DWORD& s)
+void CMainDlg::AddFiles(ListXml& t, fs::path const& p, DWORD& s)
 {
-	if (l.leaf().string()[0] == '.')
-		return ;
-	path f(p / l);
-	if (is_directory(f))
+	for (fs::recursive_directory_iterator it(p); it != fs::recursive_directory_iterator(); it++)
 	{
-		for (directory_iterator i(f), end; i != end; ++i)
-			AddFiles(t, p, l / i->path().leaf(), s);
-	}
-	else
-	{
-		XMLNODEINFO xml;
-		xml.dwSize = (DWORD)file_size(f);
-		xml.strName = f.string().c_str();
-		xml.strName.Replace(_T('/'), _T('\\'));
+		if (!fs::is_directory(*it))
+		{
+			XMLNODEINFO xml;
+			xml.dwSize = (DWORD)fs::file_size(*it);
+			xml.strName = it->path().string().c_str();
+			xml.strName.Replace(_T('/'), _T('\\'));
 
-		char szMd5[33] = "";				
+			char szMd5[33] = "";
 #ifdef UNICODE
-		MDFile(CW2A(xml.strName.GetBuffer(0), CP_ACP), szMd5);
-		OutputDebugString(xml.strName.GetBuffer(0));
-		ATLTRACE("\n md5:%s\n", szMd5);
+			MDFile(CW2A(xml.strName.GetBuffer(0), CP_ACP), szMd5);
+			OutputDebugString(xml.strName.GetBuffer(0));
+			ATLTRACE("\n md5:%s\n", szMd5);
 #else
-		MDFile(name.GetBuffer(0), szMd5);
-		OutputDebugString(xml.strName.GetBuffer(0));
-		ATLTRACE("\n md5:%s\n", szMd5);
+			MDFile(name.GetBuffer(0), szMd5);
+			OutputDebugString(xml.strName.GetBuffer(0));
+			ATLTRACE("\n md5:%s\n", szMd5);
 #endif // UNICODE
 
-		xml.strMd5 = szMd5;
-		xml.strMd5.Trim();
-		xml.strCommand = _T("");
-		// 是否需要注册.
-		HINSTANCE hLib = LoadLibraryEx(xml.strName, NULL, DONT_RESOLVE_DLL_REFERENCES);
-		if (hLib)
-		{
-			if (GetProcAddress(hLib, "DllRegisterServer"))
-            xml.strCommand = _T("regsvr");
-			FreeLibrary(hLib);
-		}
-		// 是否需要压缩.
-		xml.strCompress = _T("gz");
+			xml.strMd5 = szMd5;
+			xml.strMd5.Trim();
+			xml.strCommand = _T("");
+			// 是否需要注册.
+			HINSTANCE hLib = LoadLibraryEx(xml.strName, NULL, DONT_RESOLVE_DLL_REFERENCES);
+			if (hLib)
+			{
+				if (GetProcAddress(hLib, "DllRegisterServer"))
+					xml.strCommand = _T("regsvr");
+				FreeLibrary(hLib);
+			}
+			// 是否需要压缩.
+			xml.strCompress = _T("gz");
 
-		// 文件版本信息.
-		xml.lVersion = 0;
-		m_thCheck.GetFileVersion(xml.strName.GetBuffer(0), xml.lVersion);
-	
-		s++; // 统计文件总数.
-		t.push_back(xml);
+			// 文件版本信息.
+			xml.lVersion = 0;
+			m_thCheck.GetFileVersion(xml.strName.GetBuffer(0), xml.lVersion);
+
+			s++; // 统计文件总数.
+			t.push_back(xml);
+		}
 	}
 }
 
@@ -470,24 +465,22 @@ LRESULT CMainDlg::OnDropfiles(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, B
 		strName.Preallocate(nNameSize);		
 		DragQueryFile(hDrop, i, strName.GetBuffer(0), nNameSize);
 		strName.ReleaseBuffer();
-		CFindFile finder;
-		finder.FindFile(strName);
  		// 开始检查文件...
 #ifdef UNICODE
 		std::string str = CW2A(strName.GetBuffer(0), CP_ACP);
 #else
 		std::string str = strName.GetBuffer(0);
 #endif // UNICODE
-		path full_path = complete(path(str.c_str()));
-		if (finder.IsDirectory())
+		fs::path full_path = fs::complete(fs::path(str.c_str()));
+		if (fs::is_directory(full_path))
 		{
  			m_strInPath = strName;
-			AddFiles(m_lstXmlInfo, full_path.branch_path(), full_path.leaf(), dwFileCount);
+			AddFiles(m_lstXmlInfo, full_path, dwFileCount);
 		}
 		else
 		{
 			XMLNODEINFO xml;
-			path f(full_path.branch_path() / full_path.leaf());
+			fs::path f(full_path.branch_path() / full_path.leaf());
 			xml.dwSize = (DWORD)file_size(f);
 			xml.strName = f.string().c_str();
 			xml.strName.Replace(_T('/'), _T('\\'));

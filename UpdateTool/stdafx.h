@@ -108,7 +108,7 @@ extern CAppModule _Module;
 
 // using namespace Loki;
 using namespace boost;
-using namespace boost::filesystem;
+namespace fs = boost::filesystem;
 
 // #define USE_BOOST_THREAD
 
@@ -118,7 +118,7 @@ typedef struct
 	CString strFullPath;    // 全路径.
 	CString strName;        // 文件名.
 	CString strMd5;         // 文件的MD5值.
-   CString strUpdateMd5;   // 更新文件的md5值.
+	CString strUpdateMd5;   // 更新文件的md5值.
 	CString strUrl;         // 下载的url,默认为空.
 	CString strCommand;     // 命令.
 	CString strCompress;    // 压缩选项.

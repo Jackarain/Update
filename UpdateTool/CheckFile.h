@@ -21,10 +21,10 @@ public:
     void GetFileList(ListXml& mFileList);
 
     // 统计文件数.
-    void CountFileSum(path const& p, path const& l);
+    void CountFileSum(fs::path const& p);
 
     // 添加文件到列表.
-    void AddFiles(ListXml& t, path const& p, path const& l);
+    void AddFiles(ListXml& t, fs::path const& p);
 
     // 返回文件总数.
     DWORD GetListCount() { return m_dwFileCount; }

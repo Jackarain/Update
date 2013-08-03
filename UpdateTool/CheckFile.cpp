@@ -38,7 +38,7 @@ BOOL CCheckFile::GetFileVersion(LPCTSTR szFilename, LONGLONG& lVer)
     if (!GetFileVersionInfo(szFilename, 0, dwVerInfoSize, lpVersionInfo))
     {
         delete[] lpVersionInfo;
-        return FALSE;		
+        return FALSE;
     }
     // 查询文件版本信息.
     if (!VerQueryValue(lpVersionInfo, _T("\\"), (LPVOID *)&lpFileInfo, &uLen))
@@ -69,10 +69,10 @@ BOOL CCheckFile::GetFileVersion(LPCTSTR szFilename, CString& strVer)
     // 格式化为字符串.
     DWORD dwFileVersionMS = lVer >> 32;
     DWORD dwFileVersionLS = lVer & 0x00000000FFFFFFFF;
-    DWORD dwVer1 = HIWORD(dwFileVersionMS); 
-    DWORD dwVer2 = LOWORD(dwFileVersionMS); 
-    DWORD dwVer3 = HIWORD(dwFileVersionLS); 
-    DWORD dwVer4 = LOWORD(dwFileVersionLS);		
+    DWORD dwVer1 = HIWORD(dwFileVersionMS);
+    DWORD dwVer2 = LOWORD(dwFileVersionMS);
+    DWORD dwVer3 = HIWORD(dwFileVersionLS);
+    DWORD dwVer4 = LOWORD(dwFileVersionLS);
     strVer.Format(_T("%d.%d.%d.%d"), dwVer1, dwVer2, dwVer3, dwVer4);
 
     return TRUE;
@@ -100,9 +100,9 @@ BOOL CCheckFile::GetFileVersion(LONGLONG& lVer, CString& strVer)
 {
     DWORD dwFileVersionMS = lVer >> 32;
     DWORD dwFileVersionLS = lVer & 0x00000000FFFFFFFF;
-    DWORD dwVer1 = HIWORD(dwFileVersionMS); 
-    DWORD dwVer2 = LOWORD(dwFileVersionMS); 
-    DWORD dwVer3 = HIWORD(dwFileVersionLS); 
+    DWORD dwVer1 = HIWORD(dwFileVersionMS);
+    DWORD dwVer2 = LOWORD(dwFileVersionMS);
+    DWORD dwVer3 = HIWORD(dwFileVersionLS);
     DWORD dwVer4 = LOWORD(dwFileVersionLS);
     strVer.Format(_T("%d.%d.%d.%d"), dwVer1, dwVer2, dwVer3, dwVer4);
 
@@ -118,7 +118,7 @@ int CCheckFile::CompareVersion(LPCTSTR szFile1, LPCTSTR szFile2)
     if (!GetFileVersion(szFile1, lVer1))
         return nRet;
     if (!GetFileVersion(szFile2, lVer2))
-        return nRet;		
+        return nRet;
 
     // 计算.
     nRet = (int)(lVer1 - lVer2);
@@ -126,71 +126,61 @@ int CCheckFile::CompareVersion(LPCTSTR szFile1, LPCTSTR szFile2)
     return nRet;
 }
 
-void CCheckFile::AddFiles(ListXml& t, path const& p, path const& l)
+void CCheckFile::AddFiles(ListXml& t, fs::path const& p)
 {
-    if (l.leaf().string()[0] == '.')
-        return ;
-    path f(p / l);
-    if (is_directory(f))
-    {
-        for (directory_iterator i(f), end; i != end; ++i)
-            AddFiles(t, p, l / i->path().leaf());
-    }
-    else
-    {
-        m_xmlTemp.dwSize = (DWORD)file_size(f);
-        m_xmlTemp.strName = f.string().c_str();
-        m_xmlTemp.strName.Replace(_T('/'), _T('\\'));
+	for (fs::recursive_directory_iterator it(p); it != fs::recursive_directory_iterator(); it++)
+	{
+		if (!fs::is_directory(*it))
+		{
+			m_xmlTemp.dwSize = (DWORD)fs::file_size(*it);
+			m_xmlTemp.strName = it->path().string().c_str();
+			m_xmlTemp.strName.Replace(_T('/'), _T('\\'));
 
-        char szMd5[33] = "";
+			char szMd5[33] = "";
 #ifdef UNICODE
-        MDFile(CW2A(m_xmlTemp.strName.GetBuffer(0), CP_ACP), szMd5);
-        OutputDebugString(m_xmlTemp.strName.GetBuffer(0));
-        ATLTRACE("\n md5:%s\n", szMd5);
+			MDFile(CW2A(m_xmlTemp.strName.GetBuffer(0), CP_ACP), szMd5);
+			OutputDebugString(m_xmlTemp.strName.GetBuffer(0));
+			ATLTRACE("\n md5:%s\n", szMd5);
 #else
-        MDFile(name.GetBuffer(0), szMd5);
-        OutputDebugString(m_xmlTemp.strName.GetBuffer(0));
-        ATLTRACE("\n md5:%s\n", szMd5);
+			MDFile(name.GetBuffer(0), szMd5);
+			OutputDebugString(m_xmlTemp.strName.GetBuffer(0));
+			ATLTRACE("\n md5:%s\n", szMd5);
 #endif // UNICODE
 
-        m_xmlTemp.strMd5 = szMd5;
-        m_xmlTemp.strMd5.Trim();
-        m_xmlTemp.strCommand = _T("");
-        // 是否需要注册.
-        HINSTANCE hLib = LoadLibraryEx(m_xmlTemp.strName, NULL, DONT_RESOLVE_DLL_REFERENCES);
-        if (hLib) {
-           if (GetProcAddress(hLib, "DllRegisterServer"))
-              m_xmlTemp.strCommand = _T("regsvr");
-           FreeLibrary(hLib);
-        }
-        // 是否需要压缩.
-        m_xmlTemp.strCompress = _T("gz");
+			m_xmlTemp.strMd5 = szMd5;
+			m_xmlTemp.strMd5.Trim();
+			m_xmlTemp.strCommand = _T("");
+			// 是否需要注册.
+			HINSTANCE hLib = LoadLibraryEx(m_xmlTemp.strName, NULL, DONT_RESOLVE_DLL_REFERENCES);
+			if (hLib) {
+				if (GetProcAddress(hLib, "DllRegisterServer"))
+					m_xmlTemp.strCommand = _T("regsvr");
+				FreeLibrary(hLib);
+			}
+			// 是否需要压缩.
+			m_xmlTemp.strCompress = _T("gz");
 
-        // 文件版本信息.
-        m_xmlTemp.lVersion = 0;
-        GetFileVersion(m_xmlTemp.strName.GetBuffer(0), m_xmlTemp.lVersion);
+			// 文件版本信息.
+			m_xmlTemp.lVersion = 0;
+			GetFileVersion(m_xmlTemp.strName.GetBuffer(0), m_xmlTemp.lVersion);
 
-        t.push_back(m_xmlTemp);
-        m_dwFileCount++;
-        // 此时文件总数已计算得出.
-        ::PostMessage(m_hMsgWnd, WM_CHECK_PROGRESS, (WPARAM)&m_xmlTemp, m_dwFileCount);
-    }
+			t.push_back(m_xmlTemp);
+			m_dwFileCount++;
+			// 此时文件总数已计算得出.
+			::PostMessage(m_hMsgWnd, WM_CHECK_PROGRESS, (WPARAM)&m_xmlTemp, m_dwFileCount);
+		}
+	}
 }
 
-void CCheckFile::CountFileSum(path const& p, path const& l)
+void CCheckFile::CountFileSum(fs::path const& p)
 {
-    if (l.leaf().string()[0] == '.')
-        return ;
-    path f(p / l);
-    if (is_directory(f))
-    {
-        for (directory_iterator i(f), end; i != end; ++i)
-            CountFileSum(p, l / i->path().leaf());
-    }
-    else
-    {
-        m_dwFileCount++;
-    }
+	for (fs::recursive_directory_iterator it(p); it != fs::recursive_directory_iterator(); it++)
+	{
+		if (!fs::is_directory(*it))
+		{
+			m_dwFileCount++;
+		}
+	}
 }
 
 HRESULT CCheckFile::Execute(DWORD_PTR dwParam, HANDLE hObject)
@@ -217,10 +207,10 @@ HRESULT CCheckFile::Execute(DWORD_PTR dwParam, HANDLE hObject)
 #else
         std::string str = strPath.GetBuffer(0);
 #endif // UNICODE
-        path full_path = complete(path(str.c_str()));
+        fs::path full_path = fs::complete(fs::path(str.c_str()));
         try
         {
-            CountFileSum(full_path.branch_path(), full_path.leaf());
+            CountFileSum(full_path);
         }
         catch (std::exception& e)
         {
@@ -232,7 +222,7 @@ HRESULT CCheckFile::Execute(DWORD_PTR dwParam, HANDLE hObject)
         m_dwFileCount = 0;
         try
         {
-            AddFiles(m_lstXmlInfo, full_path.branch_path(), full_path.leaf());
+            AddFiles(m_lstXmlInfo, full_path);
         }
         catch (std::exception& e)
         {

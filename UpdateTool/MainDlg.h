@@ -263,7 +263,7 @@ public:
    boost::thread m_thr_gen;   // 生成xml文件.
 
 	// 添加文件到ListXml.
-	void AddFiles(ListXml& t, path const& p, path const& l, DWORD& s);
+	void AddFiles(ListXml& t, fs::path const& p, DWORD& s);
    // 生成xml.
    void GenXmlFile();
 
