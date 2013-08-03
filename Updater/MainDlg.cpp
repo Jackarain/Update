@@ -46,7 +46,7 @@ LRESULT CMainDlg::OnOK(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /
 {
 	if (m_updater.result() == updater::st_updating)
 		return 0;
-   m_updater.start("http://codedoom.net/update/filelist.xml",
+	m_updater.start("http://codedoom.net/update/filelist.xml",
 		boost::bind(&CMainDlg::check_files_callback, this, _1, _2, _3),
       boost::bind(&CMainDlg::down_load_callback, this, _1, _2, _3, _4, _5, _6, _7),
       boost::bind(&CMainDlg::check_files_callback, this, _1, _2, _3),
@@ -57,7 +57,7 @@ LRESULT CMainDlg::OnOK(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /
 
 LRESULT CMainDlg::OnCancel(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
 {
-   m_updater.stop();
+	m_updater.stop();
 	EndDialog(wID);
 	return 0;
 }
