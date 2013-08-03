@@ -93,8 +93,6 @@ protected:
 	// 最后修改时间.
 	std::string make_http_last_modified(const std::string& file);
 	std::string last_modified(const std::string& file);
-	bool parser_http_last_modified(const std::string& str, struct tm* time);
-	bool parser_last_modified(const std::string& str, struct tm* time);
 
 private:
 	fun_check_files_callback m_setup_file_check;

@@ -572,36 +572,3 @@ std::string updater_impl::last_modified(const std::string& file)
 
 	return str;
 }
-
-bool updater_impl::parser_http_last_modified(const std::string& str, struct tm* time)
-{
-   std::string date;
-   time_t t;
-
-   std::size_t pos = str.find(':');
-   if (pos != std::string::npos)
-      date = str.substr(pos + 1, str.length() - pos);
-   else
-      date = str;
-   if (parsedate(date.c_str(), &t) != PARSEDATE_OK)
-      return false;
-   struct tm* tm = localtime(&t);
-   if (!tm)
-      return false;
-   *time = *tm;
-
-   return true;
-}
-
-bool updater_impl::parser_last_modified(const std::string& str, struct tm* time)
-{
-	time_t t;
-	if (parsedate(str.c_str(), &t) != PARSEDATE_OK)
-		return false;
-	struct tm* tm = localtime(&t);
-	if (!tm)
-		return false;
-	*time = *tm;
-
-	return true;
-}
