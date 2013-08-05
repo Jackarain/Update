@@ -73,7 +73,6 @@
     <ClCompile Include="parser_http_date.cpp" />
     <ClCompile Include="uncompress.cpp" />
     <ClCompile Include="updater.cpp" />
-    <ClCompile Include="url.cpp" />
     <ClCompile Include="..\common\tinyxml\tinystr.cpp" />
     <ClCompile Include="..\common\tinyxml\tinyxml.cpp" />
     <ClCompile Include="..\common\tinyxml\tinyxmlerror.cpp" />
@@ -106,7 +105,6 @@
     <ClInclude Include="uncompress.hpp" />
     <ClInclude Include="updater.hpp" />
     <ClInclude Include="updater_impl.hpp" />
-    <ClInclude Include="url.hpp" />
     <ClInclude Include="..\common\zlib-1.2.5\crc32.h" />
     <ClInclude Include="..\common\zlib-1.2.5\crypt.h" />
     <ClInclude Include="..\common\zlib-1.2.5\deflate.h" />

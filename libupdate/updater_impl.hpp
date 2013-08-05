@@ -15,7 +15,6 @@
 
 #pragma once
 
-#include "url.hpp"
 #include "md5.hpp"
 #include "tinyxml.h"
 #include "updater.hpp"

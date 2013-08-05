@@ -42,9 +42,6 @@
     <ClCompile Include="updater.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="url.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="..\common\tinyxml\tinystr.cpp">
       <Filter>源文件\tinyxml</Filter>
     </ClCompile>
@@ -135,9 +132,6 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="updater_impl.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="url.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="..\common\zlib-1.2.5\crc32.h">

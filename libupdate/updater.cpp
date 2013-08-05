@@ -75,11 +75,11 @@ bool updater_impl::check_update(const std::string& l, const std::string& s)
 		std::string file_name;
 		std::string target_file;
 		char md5_buf[33] = { 0 };
-		url u = l;
+		avhttp::url u = l;
 
 		// 得到临时文件夹路径.
 		fs::path p = fs::temp_directory_path();
-		file_name = p.string() + u.filename();
+		file_name = p.string() + fs::path(u.path()).leaf().string();
 		std::string extera_header = last_modified(file_name);
 		xml_node_info info;
 		// 下载xml文件到临时文件夹.
@@ -134,11 +134,11 @@ void updater_impl::update_files()
 		std::string file_name;
 		std::string target_file;
 		char md5_buf[33] = { 0 };
-		url u = m_url;
+		avhttp::url u = m_url;
 
 		// 得到临时文件夹路径.
 		fs::path p = fs::temp_directory_path();
-		file_name = p.string() + u.filename();
+		file_name = p.string() + fs::path(u.path()).leaf().string();
 		std::string extera_header = last_modified(file_name);
 		xml_node_info info;
 		// 下载xml文件到临时文件夹.
@@ -186,7 +186,7 @@ void updater_impl::update_files()
 					}
 					u = i->second.url;
 					fs::path temp_path = p.string() + fs::path(i->first).parent_path().string();
-					temp_path = temp_path / u.filename();
+					temp_path = temp_path / fs::path(u.path()).leaf();
 					file_name = temp_path.string();
 					// 此处验证压缩文件的md5值, 根据md5进行判断是否下载.
 					std::string md5;
@@ -220,7 +220,7 @@ void updater_impl::update_files()
 					}
 					u = i->second.url;
 					fs::path temp_path = p.string() + fs::path(i->first).parent_path().string();
-					temp_path = temp_path / u.filename();
+					temp_path = temp_path / fs::path(u.path()).leaf();
 					file_name = temp_path.string();
 					// 解压缩, 支持gz和zip两种压缩方案.
 					if (!i->second.compress.empty()) {
@@ -356,7 +356,7 @@ bool updater_impl::file_down_load(const std::string& u,
 	info_map::iterator node/* = info_map::iterator()*/)
 {
 	time_t last_modified_time = 0;
-	url url = u;
+	avhttp::url url = u;
 
 	try {
 		std::fstream fs;
@@ -424,7 +424,7 @@ bool updater_impl::file_down_load(const std::string& u,
 			if (m_is_downloading && content_length != -1) {
 				int read_bytes = content_length - remainder;
 				m_total_read_bytes += recvive_bytes;
-				down_load_callback(url.filename(), m_update_file_list.size(), m_current_index,
+				down_load_callback(fs::path(url.path()).leaf().string(), m_update_file_list.size(), m_current_index,
 					m_upfile_total_size, m_total_read_bytes, content_length, read_bytes);
 			}
 			if (m_abort)
