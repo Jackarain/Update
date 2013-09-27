@@ -59,7 +59,7 @@ public:
 		std::string command;          // 命令.
 		std::string compress;         // 压缩选项.
 		bool check;							// 文件检查选项, 如果为ture, 则表示不比较MD5, 只当文件不存在时才更新.
-		boost::uint32_t size;         // 大小.
+		boost::int64_t size;         // 大小.
 	} xml_node_info;
 
 	typedef std::map<std::string, xml_node_info> info_map;
@@ -84,8 +84,7 @@ protected:
 
 	// 文件下载.
 	bool file_down_load(const std::string& u, const std::string& file,
-		const std::string& extera_header = "",
-		info_map::iterator node = info_map::iterator());
+		const std::string& extera_header = "", boost::int64_t size = -1);
 	void down_load_callback(std::string file, int count, int index, 
 		int total_size, int total_read_bytes, int file_size, int read_bytes);
 

@@ -198,7 +198,7 @@ void updater_impl::update_files()
 					}
 					// 比较md5.
 					if (md5 != i->second.filehash || i->second.filehash == "") {
-						if (!file_down_load(i->second.url, file_name, extera_header, i)) {
+						if (!file_down_load(i->second.url, file_name, extera_header, i->second.size)) {
 							std::cout << "download file \'" << file_name.c_str() << "\'failed!\n";
 							return ;
 						}
@@ -353,7 +353,7 @@ void updater_impl::update_files()
 
 bool updater_impl::file_down_load(const std::string& u,
 	const std::string& file, const std::string& extera_header/* = ""*/,
-	info_map::iterator node/* = info_map::iterator()*/)
+	boost::int64_t size/* = -1*/)
 {
 	time_t last_modified_time = 0;
 	avhttp::url url = u;
@@ -397,8 +397,10 @@ bool updater_impl::file_down_load(const std::string& u,
 		content_length = stream.content_length();
 		// 如果文件大小没有从http服务器获得, 从xml中获取.
 		if (content_length == -1) {
-			if (node != info_map::iterator()) {
-				content_length = node->second.size;
+			if (size != -1 && size != 0) {
+				content_length = size;
+			} else {
+				BOOST_ASSERT(0);	// xml中的大小也不对, 糟糕!
 			}
 		}
 		// 记录需要下载的字节数.
